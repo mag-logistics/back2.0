@@ -19,7 +19,7 @@ public class MagicResponse extends GenericEntity {
     private Storekeeper storekeeper;
 
     @NotEmpty
-    @Column(name = "date")
+    @Column(name = "response_date")
     private Date date;
 
 }

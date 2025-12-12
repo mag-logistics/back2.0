@@ -19,7 +19,7 @@ public class ExtractionResponse extends GenericEntity {
     private Extractor extractor;
 
     @NotEmpty
-    @Column(name = "date")
+    @Column(name = "response_date")
     private Date date;
 
 }

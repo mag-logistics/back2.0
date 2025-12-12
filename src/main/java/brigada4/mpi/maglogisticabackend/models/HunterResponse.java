@@ -19,7 +19,7 @@ public class HunterResponse extends GenericEntity{
     private Hunter hunter;
 
     @NotEmpty
-    @Column(name = "date")
+    @Column(name = "response_date")
     private Date date;
 
 }
