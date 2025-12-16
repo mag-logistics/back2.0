@@ -29,8 +29,7 @@ public class ExtractionApplication extends GenericEntity {
     @OneToOne(mappedBy = "extractionApp")
     private HunterApplication hunterApp;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "status_id", referencedColumnName = "id")
+    @Enumerated(EnumType.STRING)
     private ApplicationStatus status;
 
     @NotEmpty

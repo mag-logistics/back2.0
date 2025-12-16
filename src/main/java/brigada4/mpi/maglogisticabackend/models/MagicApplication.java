@@ -27,8 +27,7 @@ public class MagicApplication extends GenericEntity {
     @JoinColumn(name = "extraction_app_id")
     private ExtractionApplication extractionApp;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "status_id", referencedColumnName = "id")
+    @Enumerated(EnumType.STRING)
     private ApplicationStatus status;
 
     @NotEmpty

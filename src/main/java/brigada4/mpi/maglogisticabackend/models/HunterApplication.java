@@ -27,13 +27,17 @@ public class HunterApplication extends GenericEntity {
     @JoinColumn(name = "extractor_id", referencedColumnName = "id")
     private Extractor extractor;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "status_id", referencedColumnName = "id")
+    @Enumerated(EnumType.STRING)
     private ApplicationStatus status;
 
+    //Данные, которые заполняет высасыватель в форме заявки
     @NotEmpty
-    @Column(name = "volume")
-    private int volume;
+    @Column(name = "animal_count")
+    private int animalCount;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="animal_id", referencedColumnName = "id")
+    private Animal animal;
 
     @NotEmpty
     @Column(name = "init_date")
@@ -42,5 +46,4 @@ public class HunterApplication extends GenericEntity {
     @NotEmpty
     @Column(name = "deadline")
     private Date deadline;
-
 }
