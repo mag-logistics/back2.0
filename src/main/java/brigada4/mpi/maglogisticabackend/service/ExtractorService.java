@@ -1,14 +1,19 @@
 package brigada4.mpi.maglogisticabackend.service;
 
+import brigada4.mpi.maglogisticabackend.dto.ExtractionApplicationDTO;
+import brigada4.mpi.maglogisticabackend.dto.HunterApplicationDTO;
+import brigada4.mpi.maglogisticabackend.payload.CreateHunterApplicationRequest;
 import brigada4.mpi.maglogisticabackend.repositories.ExtractorRepository;
 import org.springframework.stereotype.Service;
 
-@Service
-public class ExtractorService {
+import java.util.List;
 
-    private final ExtractorRepository extractorRepository;
+public interface ExtractorService {
 
-    public ExtractorService(ExtractorRepository extractorRepository) {
-        this.extractorRepository = extractorRepository;
-    }
+    List<ExtractionApplicationDTO> getAllApplications();
+
+    ExtractionApplicationDTO getApplicationById(String id);
+
+    HunterApplicationDTO createHunterApplication(String extractorId, CreateHunterApplicationRequest request);
+
 }

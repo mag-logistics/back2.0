@@ -1,16 +1,19 @@
 package brigada4.mpi.maglogisticabackend.service;
 
+import brigada4.mpi.maglogisticabackend.dto.HunterApplicationDTO;
+import brigada4.mpi.maglogisticabackend.dto.StatusDTO;
+import brigada4.mpi.maglogisticabackend.models.HunterApplication;
 import brigada4.mpi.maglogisticabackend.repositories.HunterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
-public class HunterService {
+import java.util.List;
 
-    private final HunterRepository hunterRepository;
+public interface HunterService {
 
-    @Autowired
-    public HunterService(HunterRepository hunterRepository) {
-        this.hunterRepository = hunterRepository;
-    }
+    List<HunterApplicationDTO> getAllApplications();
+
+    HunterApplicationDTO getApplicationById(String id);
+
+    HunterApplicationDTO changeApplicationStatus(String id, StatusDTO statusDTO) throws IllegalAccessException;
 }

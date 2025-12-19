@@ -1,12 +1,18 @@
 package brigada4.mpi.maglogisticabackend.controllers;
 
+import brigada4.mpi.maglogisticabackend.dto.ExtractionApplicationDTO;
+import brigada4.mpi.maglogisticabackend.dto.HunterApplicationDTO;
+import brigada4.mpi.maglogisticabackend.payload.CreateHunterApplicationRequest;
 import brigada4.mpi.maglogisticabackend.service.ExtractorService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/extractor/")
+@CrossOrigin("http://localhost:5173")
 public class ExtractorController {
 
     private final ExtractorService extractorService;
@@ -14,6 +20,24 @@ public class ExtractorController {
     @Autowired
     public ExtractorController(ExtractorService extractorService) {
         this.extractorService = extractorService;
+    }
+
+    @GetMapping
+    public List<ExtractionApplicationDTO> getAllApplications() {
+        return extractorService.getAllApplications();
+    }
+
+    @GetMapping
+    public ExtractionApplicationDTO getApplicationById(String id) {
+        return extractorService.getApplicationById(id);
+    }
+
+    @PostMapping
+    public HunterApplicationDTO createHunterApplication(
+            @PathVariable String extractorId,
+            @RequestBody CreateHunterApplicationRequest request
+    ) {
+        return extractorService.createHunterApplication(extractorId, request);
     }
 
 }
