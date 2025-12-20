@@ -4,7 +4,6 @@ import brigada4.mpi.maglogisticabackend.dto.HunterApplicationDTO;
 import brigada4.mpi.maglogisticabackend.dto.StatusDTO;
 import brigada4.mpi.maglogisticabackend.exception.NotFoundException;
 import brigada4.mpi.maglogisticabackend.mapper.HunterApplicationMapper;
-import brigada4.mpi.maglogisticabackend.repositories.ApplicationStatusRepository;
 import brigada4.mpi.maglogisticabackend.repositories.HunterApplicationRepository;
 import brigada4.mpi.maglogisticabackend.repositories.HunterRepository;
 import brigada4.mpi.maglogisticabackend.repositories.HunterResponseRepository;
@@ -20,14 +19,12 @@ public class HunterServiceImpl implements HunterService {
     private final HunterApplicationRepository hunterApplicationRepository;
     private final HunterResponseRepository hunterResponseRepository;
     private final HunterApplicationMapper hunterApplicationMapper;
-    private final ApplicationStatusRepository applicationStatusRepository;
 
-    public HunterServiceImpl(HunterRepository hunterRepository, HunterApplicationRepository hunterApplicationRepository, HunterResponseRepository hunterResponseRepository, HunterApplicationMapper hunterApplicationMapper, ApplicationStatusRepository applicationStatusRepository) {
+    public HunterServiceImpl(HunterRepository hunterRepository, HunterApplicationRepository hunterApplicationRepository, HunterResponseRepository hunterResponseRepository, HunterApplicationMapper hunterApplicationMapper) {
         this.hunterRepository = hunterRepository;
         this.hunterApplicationRepository = hunterApplicationRepository;
         this.hunterResponseRepository = hunterResponseRepository;
         this.hunterApplicationMapper = hunterApplicationMapper;
-        this.applicationStatusRepository = applicationStatusRepository;
     }
 
     @Override

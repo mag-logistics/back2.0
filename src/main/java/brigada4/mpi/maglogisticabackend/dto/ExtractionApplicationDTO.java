@@ -9,11 +9,11 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ExtractionApplicationDTO(
         String id,
-        Magic magic,
-        MagicApplication magicApp,
-        Storekeeper storekeeper,
-        ExtractionResponse extractionResponse,
-        HunterApplication hunterApp,
+        MagicDTO magic,
+        MagicApplicationDTO magicApp,
+        StorekeeperDTO storekeeper,
+        ExtractionResponseDTO extractionResponse,
+        HunterApplicationDTO hunterApp,
         ApplicationStatus status,
         int volume,
         Date initDate,

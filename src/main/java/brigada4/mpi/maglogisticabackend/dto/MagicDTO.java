@@ -12,9 +12,9 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MagicDTO {
     private String id;
-    private MagicTypeDTO magicTypeDTO;
-    private MagicColourDTO magicColourDTO;
-    private MagicStateDTO magicStateDTO;
-    private MagicPowerDTO magicPowerDTO;
-    private MagicStorageDTO magicStorageDTO;
+    private MagicTypeDTO magicType;
+    private MagicColourDTO magicColour;
+    private MagicStateDTO magicState;
+    private MagicPowerDTO magicPower;
+    private MagicStorageDTO magicStorage;
 }

@@ -16,7 +16,7 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MagicResponseDTO {
     private String id;
-    private MagicApplicationDTO magicAppDTO;
-    private StorekeeperDTO storekeeperDTO;
+    private MagicApplicationDTO magicApp;
+    private StorekeeperDTO storekeeper;
     private Date date;
 }

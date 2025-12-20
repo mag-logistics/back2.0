@@ -10,13 +10,13 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class HunterApplicationDTO {
     private String id;
-    private HunterResponseDTO hunterResponseDTO;
-    private ExtractionApplicationDTO extractionAppDTO;
-    private MagicDTO magicDTO;
-    private ExtractorDTO extractorDTO;
+    private HunterResponseDTO hunterResponse;
+    private ExtractionApplicationDTO extractionApp;
+    private MagicDTO magic;
+    private ExtractorDTO extractor;
     private ApplicationStatus status;
     private int animalCount;
-    private AnimalDTO animalDTO;
+    private AnimalDTO animal;
     private Date initDate;
     private Date deadline;
 }

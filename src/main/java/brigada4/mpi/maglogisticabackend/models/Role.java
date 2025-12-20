@@ -1,6 +1,6 @@
 package brigada4.mpi.maglogisticabackend.models;
 
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+//import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,10 +21,10 @@ public enum Role {
 
     //Реализация меппера для перевода пермишена в SimpleGrantedAuthority, который необходим для SpringSecurity
     //GrantedAuthority будет использовать данный SimpleGrantedAuthority для хранения коллекции прав пользователя
-    public Set<SimpleGrantedAuthority> getAuthority() {
-        return getPermissions().stream()
-                .map(permission -> new SimpleGrantedAuthority(permission.getPermission()))
-                .collect(Collectors.toSet());
-    }
+//    public Set<SimpleGrantedAuthority> getAuthority() {
+//        return getPermissions().stream()
+//                .map(permission -> new SimpleGrantedAuthority(permission.getPermission()))
+//                .collect(Collectors.toSet());
+//    }
 
 }

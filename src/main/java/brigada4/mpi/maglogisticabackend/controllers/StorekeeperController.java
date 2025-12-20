@@ -39,7 +39,7 @@ public class StorekeeperController {
     /**
      * 3. Найти требуемую заявку
      */
-    @GetMapping("/getAllMagicAppByStorekeeper")
+    @GetMapping("/getMagicApplication")
 //    @PreAuthorize("hasAuthority('ROLE_STOREKEEPER')")
     public ResponseEntity<?> getMagicApplication(@RequestParam String magicAppId){
 
