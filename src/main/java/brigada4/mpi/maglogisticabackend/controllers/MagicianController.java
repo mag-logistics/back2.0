@@ -3,7 +3,6 @@ package brigada4.mpi.maglogisticabackend.controllers;
 import brigada4.mpi.maglogisticabackend.dto.MagicApplicationDTO;
 import brigada4.mpi.maglogisticabackend.service.MagicianService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

@@ -12,7 +12,7 @@ import lombok.Data;
 public class AnimalDTO {
     private String id;
     private String name;
-    private MagicDTO magicDTO;
-    private AnimalStorageDTO animalStorageDTO;
+    private MagicDTO magic;
+    private AnimalStorageDTO animalStorage;
     private int magicVolume;
 }

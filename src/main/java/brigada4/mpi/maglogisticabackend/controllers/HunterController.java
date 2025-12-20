@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/hunter/")
-@CrossOrigin("http://localhost:5173")
 public class HunterController {
 
     private final HunterService hunterService;
@@ -26,18 +25,18 @@ public class HunterController {
         return hunterService.getAllApplications();
     }
 
-    @GetMapping("{/id}")
-    public HunterApplicationDTO getApplicationById(@PathVariable String id) {
+    @GetMapping("/getApplicationById")
+    public HunterApplicationDTO getApplicationById(@RequestParam String id) {
         return hunterService.getApplicationById(id);
     }
 
 
-    @PutMapping()
-    public HunterApplicationDTO changeApplicationStatus(String id, @RequestBody StatusDTO statusDTO) {
+    @PostMapping("/changeApplicationStatus")
+    public HunterApplicationDTO changeApplicationStatus(@RequestParam String id, @RequestBody StatusDTO statusDTO) {
         return null;
     }
 
-    @PostMapping()
+    @PostMapping("/closeApplication")
     public void closeApplication(@RequestBody HunterApplicationDTO hunterApplicationDTO) {
 
     }

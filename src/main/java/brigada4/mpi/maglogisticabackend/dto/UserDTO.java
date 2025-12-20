@@ -1,12 +1,7 @@
 package brigada4.mpi.maglogisticabackend.dto;
 
-import brigada4.mpi.maglogisticabackend.models.RefreshToken;
 import brigada4.mpi.maglogisticabackend.models.Role;
-import brigada4.mpi.maglogisticabackend.models.Sex;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 import java.util.Date;

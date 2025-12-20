@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/extractor/")
-@CrossOrigin("http://localhost:5173")
+@RequestMapping("/api/v1/extractor")
 public class ExtractorController {
 
     private final ExtractorService extractorService;
@@ -22,17 +21,17 @@ public class ExtractorController {
         this.extractorService = extractorService;
     }
 
-    @GetMapping
+    @GetMapping("/getAllApplications")
     public List<ExtractionApplicationDTO> getAllApplications() {
         return extractorService.getAllApplications();
     }
 
-    @GetMapping
-    public ExtractionApplicationDTO getApplicationById(String id) {
+    @GetMapping("/getApplicationById")
+    public ExtractionApplicationDTO getApplicationById(@RequestParam String id) {
         return extractorService.getApplicationById(id);
     }
 
-    @PostMapping
+    @PostMapping("/createHunterApplication")
     public HunterApplicationDTO createHunterApplication(
             @PathVariable String extractorId,
             @RequestBody CreateHunterApplicationRequest request
