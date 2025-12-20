@@ -1,6 +1,6 @@
 package brigada4.mpi.maglogisticabackend.dto;
 
-import brigada4.mpi.maglogisticabackend.models.ApplicationStatus;
+import brigada4.mpi.maglogisticabackend.models.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
@@ -8,15 +8,14 @@ import java.util.Date;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class HunterApplicationDTO {
+public class MagicApplicationDTO {
     private String id;
-    private HunterResponseDTO hunterResponseDTO;
-    private ExtractionApplicationDTO extractionAppDTO;
+    private MagicianDTO magicianDTO;
+    private MagicResponseDTO magicResponseDTO;
     private MagicDTO magicDTO;
-    private ExtractorDTO extractorDTO;
+    private ExtractionApplicationDTO extractionAppDTO;
     private ApplicationStatus status;
-    private int animalCount;
-    private AnimalDTO animalDTO;
+    private int volume;
     private Date initDate;
     private Date deadline;
 }
