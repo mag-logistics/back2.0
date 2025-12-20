@@ -50,6 +50,12 @@ public class User extends GenericEntity {
     @Column(name = "birth_date")
     private Date birthDate;
 
+    @Column(name = "reward_points")
+    private int rewardPoints;
+
+    @Column(name = "penalty_points")
+    private int penaltyPoints;
+
     public User() {
     }
 
