@@ -69,11 +69,11 @@ CREATE TABLE animal_storage
     FOREIGN KEY (animal_id) REFERENCES animals (id)
 );
 
-CREATE TABLE application_status
-(
-    id   varchar(36) NOT NULL PRIMARY KEY UNIQUE,
-    name varchar(15) NOT NULL UNIQUE
-);
+-- CREATE TABLE application_status
+-- (
+--     id   varchar(36) NOT NULL PRIMARY KEY UNIQUE,
+--     name varchar(15) NOT NULL UNIQUE
+-- );
 
 CREATE TABLE extraction_response
 (
@@ -89,10 +89,10 @@ CREATE TABLE extraction_applications
     init_date              date        NOT NULL,
     deadline               date        NOT NULL,
     status_id              varchar(36) NOT NULL,
-    extraction_response_id varchar(36),
+    extraction_response_id varchar(15),
     storekeeper_id         varchar(36) NOT NULL,
     magic_id               varchar(36) NOT NULL,
-    FOREIGN KEY (status_id) REFERENCES application_status (id),
+--     FOREIGN KEY (status_id) REFERENCES application_status (id),
     FOREIGN KEY (extraction_response_id) REFERENCES extraction_response (id),
     FOREIGN KEY (storekeeper_id) REFERENCES storekeepers (id),
     FOREIGN KEY (magic_id) REFERENCES magic (id)
@@ -102,21 +102,23 @@ CREATE TABLE hunter_response
 (
     id varchar(36) NOT NULL PRIMARY KEY UNIQUE,
     hunter_id  varchar(36) NOT NULL,
-    response_date date
+    response_date date,
+    volume int
 );
 
 CREATE TABLE hunter_application
 (
     id                 varchar(36) NOT NULL PRIMARY KEY UNIQUE,
-    volume             int         NOT NULL,
+    animal_count       int         NOT NULL,
     init_date          date        NOT NULL,
     deadline           date        NOT NULL,
+    animal_id          varchar(36) NOT NULL,
     status_id          varchar(36) NOT NULL,
     extractor_id       varchar(36) NOT NULL,
     magic_id           varchar(36) NOT NULL,
     extraction_app_id  varchar(36) NOT NULL,
     hunter_response_id varchar(36) NOT NULL,
-    FOREIGN KEY (status_id) REFERENCES application_status (id),
+    FOREIGN KEY (animal_id) REFERENCES animals (id),
     FOREIGN KEY (extractor_id) REFERENCES extractors (id),
     FOREIGN KEY (magic_id) REFERENCES magic (id),
     FOREIGN KEY (extraction_app_id) REFERENCES extraction_applications (id),
@@ -142,7 +144,7 @@ CREATE TABLE magic_applications
     magic_id           varchar(36) NOT NULL,
     magic_response_id  varchar(36) NOT NULL,
     magician_id varchar(36) NOT NULL,
-    FOREIGN KEY (status_id) REFERENCES application_status (id),
+--     FOREIGN KEY (status_id) REFERENCES application_status (id),
     FOREIGN KEY (extraction_app_id) REFERENCES extraction_applications (id),
     FOREIGN KEY (magic_id) REFERENCES magic (id),
     FOREIGN KEY (magic_response_id) REFERENCES magic_responses (id),

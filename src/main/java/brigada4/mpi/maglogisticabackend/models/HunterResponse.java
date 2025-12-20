@@ -22,4 +22,7 @@ public class HunterResponse extends GenericEntity{
     @Column(name = "response_date")
     private Date date;
 
+    @NotEmpty
+    @Column(name = "volume")
+    private int volume;
 }

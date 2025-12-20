@@ -1,17 +1,17 @@
 package brigada4.mpi.maglogisticabackend.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotEmpty;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
-@Entity
-@Table(name = "application_status")
-public class ApplicationStatus extends GenericEntity{
+@Getter
+public enum ApplicationStatus {
+    CREATED ("Создана"),
+    WORKED ("В работе"),
+    FINISHED ("Оформлена");
 
-    @NotEmpty
-    @Column(name = "name", unique = true)
-    private String name;
+    private final String name;
+
+    ApplicationStatus(String name) {
+        this.name = name;
+    }
+
 }
