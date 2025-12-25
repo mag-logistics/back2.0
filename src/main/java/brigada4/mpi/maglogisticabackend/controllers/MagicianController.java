@@ -1,11 +1,15 @@
 package brigada4.mpi.maglogisticabackend.controllers;
 
-import brigada4.mpi.maglogisticabackend.dto.MagicApplicationDTO;
+import brigada4.mpi.maglogisticabackend.dto.*;
+import brigada4.mpi.maglogisticabackend.mapper.EmployeesMapper;
 import brigada4.mpi.maglogisticabackend.mapper.MagicApplicationMapper;
+import brigada4.mpi.maglogisticabackend.models.*;
 import brigada4.mpi.maglogisticabackend.service.MagicianService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/magician")
@@ -13,11 +17,13 @@ public class MagicianController {
 
     private final MagicianService magicianService;
     private final MagicApplicationMapper magicApplicationMapper;
+    private final EmployeesMapper employeesMapper;
 
     @Autowired
-    public MagicianController(MagicianService magicianService, MagicApplicationMapper magicApplicationMapper1) {
+    public MagicianController(MagicianService magicianService, MagicApplicationMapper magicApplicationMapper1, EmployeesMapper employeesMapper) {
         this.magicianService = magicianService;
         this.magicApplicationMapper = magicApplicationMapper1;
+        this.employeesMapper = employeesMapper;
     }
 
     /**
@@ -44,30 +50,55 @@ public class MagicianController {
     //    @PreAuthorize("hasAuthority('ROLE_MAGICIAN')")
     public ResponseEntity<?> createMagicAppPattern(@RequestParam String magicianId, @RequestBody MagicApplicationDTO magicApplicationDTO) {
         if (magicianId == null || magicApplicationDTO == null) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body("Magician ID cannot be empty");
         }
         MagicApplicationDTO response = magicApplicationMapper.DTOFromPattern(magicianService.createAppPattern(magicianId, magicApplicationDTO));
         return ResponseEntity.ok(response);
     }
 
     /**
-     * 3. Получить все шаблоны заявок для определенного мага. (Данная функция должна вызываться на главной странице у мага, чтобы вывести ему все его шаблоны.
+     * 3. Получить все шаблоны заявок для определенного мага.
+     * (Данная функция должна вызываться на главной странице у мага, чтобы вывести ему все его шаблоны заявок)
      */
     @GetMapping("/getAllAppPatterns")
 //    @PreAuthorize("hasAuthority('ROLE_MAGICIAN')")
     public ResponseEntity<?> getAllMagicAppPatterns(@RequestParam String magicianId) {
-
-        return null;
+        if (magicianId == null || magicianId.isEmpty()) {
+            return ResponseEntity.badRequest().body("Magician ID cannot be empty");
+        }
+        List<MagicAppPattern> patterns = magicianService.getAllMagicAppPatterns(magicianId);
+        List<MagicAppPatternDTO> response = magicApplicationMapper.listPatterDTOFromPatterns(patterns);
+        return ResponseEntity.ok(response);
     }
 
     /**
-     * 4. Получить всех сотрудников
+     * 4.1 Получить всех кладовщиков
      */
-    @GetMapping("/getAllEmployees")
+    @GetMapping("/getAllStorekeepers")
 //    @PreAuthorize("hasAuthority('ROLE_MAGICIAN')")
-    public ResponseEntity<?> getAllEmployees() {
+    public ResponseEntity<?> getAllStorekeepers() {
+        List<StorekeeperDTO> storekeepers = employeesMapper.toStorekeeperDTOList(magicianService.findAllStorekeepers());
+        return ResponseEntity.ok(storekeepers);
+    }
 
-        return null;
+    /**
+     * 4.2 Получить всех охотников
+     */
+    @GetMapping("/getAllHunters")
+//    @PreAuthorize("hasAuthority('ROLE_MAGICIAN')")
+    public ResponseEntity<?> getAllHunters() {
+        List<HunterDTO> hunters = employeesMapper.toHunterDTOList(magicianService.findAllHunters());
+        return ResponseEntity.ok(hunters);
+    }
+
+    /**
+     * 4.3 Получить всех высасывателей
+     */
+    @GetMapping("/getAllExtractors")
+//    @PreAuthorize("hasAuthority('ROLE_MAGICIAN')")
+    public ResponseEntity<?> getAllExtractors() {
+        List<ExtractorDTO> extractors = employeesMapper.toExtractorDTOList(magicianService.findAllExtractors());
+        return ResponseEntity.ok(extractors);
     }
 
     /**
@@ -76,8 +107,11 @@ public class MagicianController {
     @GetMapping("/getEmployee")
 //    @PreAuthorize("hasAuthority('ROLE_MAGICIAN')")
     public ResponseEntity<?> getEmployeeById(@RequestParam String employeeId) {
-
-        return null;
+        if (employeeId == null || employeeId.isEmpty()) {
+            return ResponseEntity.badRequest().body("Employee ID cannot be empty");
+        }
+        UserDTO userDTO = employeesMapper.fromUser(magicianService.findEmployeeById(employeeId));
+        return ResponseEntity.ok(userDTO);
     }
 
     /**
@@ -86,8 +120,14 @@ public class MagicianController {
     @PostMapping("/assignMagicalReward")
 //    @PreAuthorize("hasAuthority('ROLE_MAGICIAN')")
     public ResponseEntity<?> assignMagicalReward(@RequestParam String employeeId, @RequestParam int rewardCount) {
-
-        return null;
+        if (employeeId == null || employeeId.isEmpty()) {
+            return ResponseEntity.badRequest().body("Employee ID cannot be empty");
+        }
+        UserDTO userDTO = employeesMapper.fromUser(magicianService.assignMagicalReward(employeeId, rewardCount));
+        if (userDTO == null) {
+            return ResponseEntity.badRequest().body("We can't find such employee");
+        }
+        return ResponseEntity.ok(userDTO);
     }
 
     /**
@@ -96,7 +136,27 @@ public class MagicianController {
     @PostMapping("/assignMagicalPenalty")
 //    @PreAuthorize("hasAuthority('ROLE_MAGICIAN')")
     public ResponseEntity<?> assignMagicalPenalty(@RequestParam String employeeId, @RequestParam int penaltyCount) {
+        if (employeeId == null || employeeId.isEmpty()) {
+            return ResponseEntity.badRequest().body("Employee ID cannot be empty");
+        }
+        UserDTO userDTO = employeesMapper.fromUser(magicianService.assignMagicalPenalty(employeeId, penaltyCount));
+        if (userDTO == null) {
+            return ResponseEntity.badRequest().body("We can't find such employee");
+        }
+        return ResponseEntity.ok(userDTO);
+    }
 
-        return null;
+    /**
+     * 8. Получение всех заявок на магию, которые связаны с конкретным магом по его id.
+     */
+    @GetMapping("/getAllMagicApp")
+//    @PreAuthorize("hasAuthority('ROLE_MAGICIAN')")
+    public ResponseEntity<?> getAllMagicApp(@RequestParam String magicianId) {
+        if (magicianId == null || magicianId.isEmpty()) {
+            return ResponseEntity.badRequest().body("Magician ID cannot be empty");
+        }
+        List<MagicApplication> magicAppDTO = magicianService.getAllMagicApp(magicianId);
+        List<MagicApplicationDTO> response = magicApplicationMapper.fromMagicApplications(magicAppDTO);
+        return ResponseEntity.ok(response);
     }
 }
