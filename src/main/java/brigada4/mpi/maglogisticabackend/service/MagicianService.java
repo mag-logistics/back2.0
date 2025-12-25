@@ -1,19 +1,16 @@
 package brigada4.mpi.maglogisticabackend.service;
 
 import brigada4.mpi.maglogisticabackend.dto.MagicApplicationDTO;
+import brigada4.mpi.maglogisticabackend.dto.UserDTO;
 import brigada4.mpi.maglogisticabackend.mapper.MagicApplicationMapper;
-import brigada4.mpi.maglogisticabackend.models.ApplicationStatus;
-import brigada4.mpi.maglogisticabackend.models.MagicAppPattern;
-import brigada4.mpi.maglogisticabackend.models.MagicApplication;
-import brigada4.mpi.maglogisticabackend.models.Magician;
-import brigada4.mpi.maglogisticabackend.repositories.MagicAppPatternRepository;
-import brigada4.mpi.maglogisticabackend.repositories.MagicApplicationRepository;
-import brigada4.mpi.maglogisticabackend.repositories.MagicianRepository;
+import brigada4.mpi.maglogisticabackend.models.*;
+import brigada4.mpi.maglogisticabackend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class MagicianService {
@@ -22,13 +19,21 @@ public class MagicianService {
     private final MagicApplicationMapper magicApplicationMapper;
     private final MagicApplicationRepository magicApplicationRepository;
     private final MagicAppPatternRepository magicAppPatternRepository;
+    private final StorekeeperRepository storekeeperRepository;
+    private final HunterRepository hunterRepository;
+    private final ExtractorRepository extractorRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public MagicianService(MagicianRepository magicianRepository, MagicApplicationMapper magicApplicationMapper, MagicApplicationRepository magicApplicationRepository, MagicAppPatternRepository magicAppPatternRepository) {
+    public MagicianService(MagicianRepository magicianRepository, MagicApplicationMapper magicApplicationMapper, MagicApplicationRepository magicApplicationRepository, MagicAppPatternRepository magicAppPatternRepository, StorekeeperRepository storekeeperRepository, HunterRepository hunterRepository, ExtractorRepository extractorRepository, UserRepository userRepository) {
         this.magicianRepository = magicianRepository;
         this.magicApplicationMapper = magicApplicationMapper;
         this.magicApplicationRepository = magicApplicationRepository;
         this.magicAppPatternRepository = magicAppPatternRepository;
+        this.storekeeperRepository = storekeeperRepository;
+        this.hunterRepository = hunterRepository;
+        this.extractorRepository = extractorRepository;
+        this.userRepository = userRepository;
     }
 
     @Transactional
@@ -54,5 +59,51 @@ public class MagicianService {
         MagicAppPattern pattern = magicApplicationMapper.fromMagicAppDTO(magicApplicationDTO);
         pattern.setMagician(magician);
         return  magicAppPatternRepository.save(pattern);
+    }
+
+    public List<MagicApplication> getAllMagicApp(String magicianId) {
+        return magicApplicationRepository.findAllByMagician(magicianId);
+    }
+
+
+    public List<MagicAppPattern> getAllMagicAppPatterns(String magicianId) {
+        return magicAppPatternRepository.findAllByMagician(magicianId);
+    }
+
+    public List<Storekeeper> findAllStorekeepers() {
+        return storekeeperRepository.findAll();
+    }
+
+    public List<Hunter> findAllHunters() {
+        return hunterRepository.findAll();
+    }
+
+    public List<Extractor> findAllExtractors() {
+        return extractorRepository.findAll();
+    }
+
+    public User findEmployeeById(String employeeId) {
+        User user = userRepository.findById(employeeId).orElse(null);
+        return user;
+    }
+
+    public User assignMagicalReward(String employeeId, int rewardCount) {
+        User user = userRepository.findById(employeeId).orElse(null);
+        if (user == null) {
+            return null;
+        }
+        int oldRewardPoints = user.getRewardPoints();
+        user.setRewardPoints(oldRewardPoints + rewardCount);
+        return userRepository.save(user);
+    }
+
+    public User assignMagicalPenalty(String employeeId, int penaltyCount) {
+        User user = userRepository.findById(employeeId).orElse(null);
+        if (user == null) {
+            return null;
+        }
+        int oldPenaltyPoints = user.getPenaltyPoints();
+        user.setRewardPoints(oldPenaltyPoints + penaltyCount);
+        return userRepository.save(user);
     }
 }

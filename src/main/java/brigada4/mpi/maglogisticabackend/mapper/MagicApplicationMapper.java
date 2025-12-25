@@ -30,4 +30,6 @@ public interface MagicApplicationMapper {
     MagicApplicationDTO DTOFromPatternDTO(MagicAppPatternDTO magicAppPattern);
 
     MagicApplicationDTO DTOFromPattern(MagicAppPattern magicAppPattern);
+
+    List<MagicAppPatternDTO> listPatterDTOFromPatterns(List<MagicAppPattern> magicAppPatterns);
 }
