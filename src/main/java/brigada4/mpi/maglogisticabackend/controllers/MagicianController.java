@@ -72,6 +72,17 @@ public class MagicianController {
     }
 
     /**
+     * 4.0 Получить всех сотрудников
+     */
+    @GetMapping("/getAllEmployees")
+//    @PreAuthorize("hasAuthority('ROLE_MAGICIAN')")
+    public ResponseEntity<?> getAllEmployees() {
+        List<UserDTO> employees = employeesMapper.fromUsers(magicianService.findAllEmployees());
+        return ResponseEntity.ok(employees);
+    }
+
+
+    /**
      * 4.1 Получить всех кладовщиков
      */
     @GetMapping("/getAllStorekeepers")
