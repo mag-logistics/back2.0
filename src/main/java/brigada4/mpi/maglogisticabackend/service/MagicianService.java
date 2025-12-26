@@ -104,7 +104,7 @@ public class MagicianService {
             return null;
         }
         int oldPenaltyPoints = user.getPenaltyPoints();
-        user.setRewardPoints(oldPenaltyPoints + penaltyCount);
+        user.setPenaltyPoints(oldPenaltyPoints + penaltyCount);
         return userRepository.save(user);
     }
 
