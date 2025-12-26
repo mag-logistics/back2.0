@@ -1,19 +1,31 @@
 package brigada4.mpi.maglogisticabackend.controllers;
 
 import brigada4.mpi.maglogisticabackend.dto.ExtractionApplicationDTO;
+import brigada4.mpi.maglogisticabackend.dto.MagicApplicationDTO;
 import brigada4.mpi.maglogisticabackend.dto.MagicResponseDTO;
+import brigada4.mpi.maglogisticabackend.mapper.ExtractionApplicationMapper;
+import brigada4.mpi.maglogisticabackend.mapper.MagicApplicationMapper;
+import brigada4.mpi.maglogisticabackend.mapper.MagicResponseMapper;
 import brigada4.mpi.maglogisticabackend.service.StorekeeperService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/storekeeper/")
 public class StorekeeperController {
 
     private final StorekeeperService storekeeperService;
+    private final MagicApplicationMapper magicApplicationMapper;
+    private final MagicResponseMapper magicResponseMapper;
+    private final ExtractionApplicationMapper extractionApplicationMapper;
 
-    public StorekeeperController(StorekeeperService storekeeperService) {
+    public StorekeeperController(StorekeeperService storekeeperService, MagicApplicationMapper magicApplicationMapper, MagicResponseMapper magicResponseMapper, ExtractionApplicationMapper extractionApplicationMapper) {
         this.storekeeperService = storekeeperService;
+        this.magicApplicationMapper = magicApplicationMapper;
+        this.magicResponseMapper = magicResponseMapper;
+        this.extractionApplicationMapper = extractionApplicationMapper;
     }
 
     /**
@@ -22,18 +34,34 @@ public class StorekeeperController {
     @GetMapping("/getAllMagicApp")
 //    @PreAuthorize("hasAuthority('ROLE_STOREKEEPER')")
     public ResponseEntity<?> getAllMagicApplication() {
-
-        return null;
+        List<MagicApplicationDTO> response = magicApplicationMapper.fromMagicApplications(storekeeperService.getAllMagicApplication());
+        return ResponseEntity.ok(response);
     }
 
     /**
-     * 2. Получить все заявки, которые уже связаны с нужным Storekeeper
+     * 2.1 Получить все заявки, которые уже связаны с нужным Storekeeper
      */
     @GetMapping("/getAllMagicAppByStorekeeper")
 //    @PreAuthorize("hasAuthority('ROLE_STOREKEEPER')")
     public ResponseEntity<?> getAllMagicApplicationByStorekeeperId(@RequestParam String storekeeperId) {
+        if (storekeeperId == null || storekeeperId.isEmpty()) {
+            return ResponseEntity.badRequest().body("StorekeeperId shouldn't be empty");
+        }
+        List<MagicApplicationDTO> response = magicApplicationMapper.fromMagicApplications(storekeeperService.getMyMagicApplication(storekeeperId));
+        return ResponseEntity.ok(response);
+    }
 
-        return null;
+    /**
+     * 2.2 Получить все MagicResponse, которые оформил данный Storekeeper
+     */
+    @GetMapping("/getAllMagicResponses")
+//    @PreAuthorize("hasAuthority('ROLE_STOREKEEPER')")
+    public ResponseEntity<?> getAllMagicResponses(@RequestParam String storekeeperId) {
+        if (storekeeperId == null || storekeeperId.isEmpty()) {
+            return ResponseEntity.badRequest().body("StorekeeperId shouldn't be empty");
+        }
+        List<MagicResponseDTO> response = magicResponseMapper.magicResponseListToMagicResponseDTOList(storekeeperService.getMyMagicResponses(storekeeperId));
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -42,8 +70,8 @@ public class StorekeeperController {
     @GetMapping("/getMagicApplication")
 //    @PreAuthorize("hasAuthority('ROLE_STOREKEEPER')")
     public ResponseEntity<?> getMagicApplication(@RequestParam String magicAppId){
-
-        return null;
+        MagicApplicationDTO magicApplicationDTO = magicApplicationMapper.fromMagicApplication(storekeeperService.getMagicApplication(magicAppId));
+        return ResponseEntity.ok(magicApplicationDTO);
     }
 
     /**
@@ -53,8 +81,15 @@ public class StorekeeperController {
     @PostMapping("/processMagicApplication")
 //    @PreAuthorize("hasAuthority('ROLE_STOREKEEPER')")
     public ResponseEntity<?> processMagicApplication(@RequestParam String storekeeperId, @RequestParam String magicApplicationId, @RequestBody MagicResponseDTO magicResponseDTO) {
-
-        return null;
+        if (storekeeperId == null || storekeeperId.isEmpty() || magicApplicationId == null || magicApplicationId.isEmpty() || magicResponseDTO == null) {
+            return ResponseEntity.badRequest().body("Parameters shouldn't be empty");
+        }
+        MagicResponseDTO response = magicResponseMapper.magicResponseToMagicResponseDTO(storekeeperService.processMagicApplication(storekeeperId, magicApplicationId, magicResponseDTO));
+        if (response == null) {
+            return ResponseEntity.badRequest().body("MagicApp doesn't update");
+        } else {
+            return ResponseEntity.ok(response);
+        }
     }
 
     /**
@@ -66,8 +101,11 @@ public class StorekeeperController {
     @GetMapping("/checkMagicAvailability")
 //    @PreAuthorize("hasAuthority('ROLE_STOREKEEPER')")
     public ResponseEntity<?> checkMagicAvailability(@RequestParam String storekeeperId, @RequestParam String magicApplicationId) {
-
-        return null;
+        if (storekeeperId == null || storekeeperId.isEmpty() || magicApplicationId == null || magicApplicationId.isEmpty()) {
+            return ResponseEntity.badRequest().body("Parameters shouldn't be empty");
+        }
+        boolean response = storekeeperService.checkMagicAvailability(storekeeperId, magicApplicationId);
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -76,7 +114,14 @@ public class StorekeeperController {
     @PostMapping("/createExtractionApp")
 //    @PreAuthorize("hasAuthority('ROLE_STOREKEEPER')")
     public ResponseEntity<?> createExtractionApp(@RequestParam String storekeeperId, @RequestBody ExtractionApplicationDTO extractionApplicationDTO) {
+        if (storekeeperId == null || storekeeperId.isEmpty() || extractionApplicationDTO == null) {
+            return ResponseEntity.badRequest().body("Parameters shouldn't be empty");
+        }
 
-        return null;
+        ExtractionApplicationDTO response = extractionApplicationMapper.toDTO(storekeeperService.createExtractionApp(storekeeperId, extractionApplicationDTO));
+        if (response == null) {
+            return ResponseEntity.badRequest().body("ExtractionApp doesn't create");
+        }
+        return ResponseEntity.ok(response);
     }
 }
