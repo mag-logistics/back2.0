@@ -4,6 +4,13 @@ import brigada4.mpi.maglogisticabackend.models.MagicStorage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface MagicStorageRepository extends JpaRepository<MagicStorage, String> {
+
+    Optional<MagicStorage> findById(String id);
+
+    Optional<MagicStorage> findByMagicId(String id);
+
 }

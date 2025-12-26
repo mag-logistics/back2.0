@@ -1,14 +1,96 @@
 package brigada4.mpi.maglogisticabackend.service;
 
-import brigada4.mpi.maglogisticabackend.repositories.StorekeeperRepository;
+import brigada4.mpi.maglogisticabackend.dto.ExtractionApplicationDTO;
+import brigada4.mpi.maglogisticabackend.dto.MagicApplicationDTO;
+import brigada4.mpi.maglogisticabackend.dto.MagicResponseDTO;
+import brigada4.mpi.maglogisticabackend.mapper.ExtractionApplicationMapper;
+import brigada4.mpi.maglogisticabackend.models.*;
+import brigada4.mpi.maglogisticabackend.repositories.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class StorekeeperService {
 
     private final StorekeeperRepository storekeeperRepository;
+    private final MagicApplicationRepository magicApplicationRepository;
+    private final MagicResponseRepository magicResponseRepository;
+    private final ExtractionApplicationMapper extractionApplicationMapper;
+    private final ExtractionApplicationRepository extractionApplicationRepository;
+    private final MagicStorageRepository magicStorageRepository;
 
-    public StorekeeperService(StorekeeperRepository storekeeperRepository) {
+    public StorekeeperService(StorekeeperRepository storekeeperRepository, MagicApplicationRepository magicApplicationRepository, MagicResponseRepository magicResponseRepository, ExtractionApplicationMapper extractionApplicationMapper, ExtractionApplicationRepository extractionApplicationRepository, MagicStorageRepository magicStorageRepository) {
         this.storekeeperRepository = storekeeperRepository;
+        this.magicApplicationRepository = magicApplicationRepository;
+        this.magicResponseRepository = magicResponseRepository;
+        this.extractionApplicationMapper = extractionApplicationMapper;
+        this.extractionApplicationRepository = extractionApplicationRepository;
+        this.magicStorageRepository = magicStorageRepository;
+    }
+
+    public List<MagicApplication> getAllMagicApplication() {
+        return magicApplicationRepository.findAllByStatus(ApplicationStatus.CREATED);
+    }
+
+
+    public List<MagicApplication> getMyMagicApplication(String storekeeperId) {
+        List<MagicResponse> responses = magicResponseRepository.findAllByStorekeeperId(storekeeperId);
+        List<MagicApplication> applications = new ArrayList<>();
+        for(MagicResponse response : responses) {
+            MagicApplication application = magicApplicationRepository.findByMagicResponseId(response.getId());
+            applications.add(application);
+        }
+        return applications;
+    }
+
+    public List<MagicResponse> getMyMagicResponses(String storekeeperId) {
+        return magicResponseRepository.findAllByStorekeeperId(storekeeperId);
+    }
+
+    public MagicApplication getMagicApplication(String magicAppId) {
+        return magicApplicationRepository.findById(magicAppId).orElse(null);
+    }
+
+    @Transactional
+    public MagicResponse processMagicApplication(String storekeeperId, String magicApplicationId, MagicResponseDTO magicResponseDTO) {
+        MagicResponse magicResponse = new MagicResponse();
+        Storekeeper storekeeper = storekeeperRepository.findById(storekeeperId).orElse(null);
+        MagicApplication magicApplication = magicApplicationRepository.findById(magicApplicationId).orElse(null);
+        if (storekeeper == null || magicApplication == null) {
+            return null;
+        }
+        magicResponse.setStorekeeper(storekeeper);
+        magicResponse.setMagicApp(magicApplication);
+
+        magicResponse.setDate(magicResponseDTO.getDate());
+
+        return magicResponseRepository.save(magicResponse);
+    }
+
+    @Transactional
+    public ExtractionApplication createExtractionApp(String storekeeperId, ExtractionApplicationDTO extractionApplicationDTO) {
+        Storekeeper storekeeper = storekeeperRepository.findById(storekeeperId).orElse(null);
+        if (storekeeper == null) {
+            return null;
+        }
+
+        ExtractionApplication extractionApplication = extractionApplicationMapper.toEntity(extractionApplicationDTO);
+        extractionApplication.setStorekeeper(storekeeper);
+        return extractionApplicationRepository.save(extractionApplication);
+    }
+
+    public boolean checkMagicAvailability(String storekeeperId, String magicApplicationId) {
+        MagicApplication magicApplication = magicApplicationRepository.findById(magicApplicationId).orElse(null);
+        if (magicApplication == null) {
+            return false;
+        }
+        MagicStorage magicStorage = magicStorageRepository.findByMagicId(magicApplication.getMagic().getId()).orElse(null);
+        if (magicStorage == null) {
+            return false;
+        }
+        return magicApplication.getVolume() <= magicStorage.getVolume();
     }
 }

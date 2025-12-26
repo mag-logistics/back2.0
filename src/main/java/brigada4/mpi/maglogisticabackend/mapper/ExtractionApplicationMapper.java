@@ -15,4 +15,6 @@ public interface ExtractionApplicationMapper {
     ExtractionApplicationDTO toDTO(ExtractionApplication entity);
 
     List<ExtractionApplicationDTO> toDTOList(List<ExtractionApplication> entities);
+
+    ExtractionApplication toEntity(ExtractionApplicationDTO dto);
 }
