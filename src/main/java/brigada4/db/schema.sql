@@ -15,7 +15,7 @@ CREATE TABLE users
     surname         varchar(250),
     patronymic      varchar(250),
     birth_date      date,
-    sex_id          varchar(25),
+    sex_id          varchar(36),
     FOREIGN KEY (sex_id) REFERENCES sex (id)
 );
 
@@ -191,5 +191,3 @@ CREATE TABLE refresh_token
     expiry_date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
-
-
