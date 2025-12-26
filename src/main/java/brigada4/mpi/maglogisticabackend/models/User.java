@@ -61,7 +61,8 @@ public class User extends GenericEntity {
 
     public User(String email,
 //                String activationCode,
-                String password, Role role, Sex sex, String name, String surname, String patronymic, Date birthDate) {
+                String password, Role role, Sex sex, String name, String surname, String patronymic, Date birthDate,
+                int rewardPoints, int penaltyPoints) {
         this.email = email;
 //        this.activationCode = activationCode;
         this.password = password;
@@ -71,6 +72,8 @@ public class User extends GenericEntity {
         this.surname = surname;
         this.patronymic = patronymic;
         this.birthDate = birthDate;
+        this.rewardPoints = rewardPoints;
+        this.penaltyPoints = penaltyPoints;
     }
 
 

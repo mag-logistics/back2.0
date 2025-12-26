@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -105,5 +106,16 @@ public class MagicianService {
         int oldPenaltyPoints = user.getPenaltyPoints();
         user.setRewardPoints(oldPenaltyPoints + penaltyCount);
         return userRepository.save(user);
+    }
+
+    public List<User> findAllEmployees() {
+        List<Storekeeper> storekeepers = storekeeperRepository.findAll();
+        List<Hunter> hunters = hunterRepository.findAll();
+        List<Extractor> extractors = extractorRepository.findAll();
+        List<User> users = new ArrayList<>();
+        users.addAll(storekeepers);
+        users.addAll(hunters);
+        users.addAll(extractors);
+        return users;
     }
 }

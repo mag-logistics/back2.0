@@ -19,6 +19,10 @@ public interface EmployeesMapper {
 
     User fromUserDTO(UserDTO userDTO);
 
+    List<UserDTO> fromUsers(List<User> users);
+
+    List<User> fromUserDTOs(List<UserDTO> userDTOs);
+
 
     Storekeeper fromStorekeeperDTO(StorekeeperDTO storekeeperDTO);
 
