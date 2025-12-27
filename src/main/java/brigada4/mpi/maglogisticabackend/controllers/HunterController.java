@@ -20,24 +20,18 @@ public class HunterController {
         this.hunterService = hunterService;
     }
 
-    @GetMapping
+    @GetMapping("/applications")
     public List<HunterApplicationDTO> getAllApplications() {
         return hunterService.getAllApplications();
     }
 
-    @GetMapping("/getApplicationById")
-    public HunterApplicationDTO getApplicationById(@RequestParam String id) {
+    @GetMapping("/applications/{id}")
+    public HunterApplicationDTO getApplicationById(@PathVariable String id) {
         return hunterService.getApplicationById(id);
     }
 
-
-    @PostMapping("/changeApplicationStatus")
+    @PostMapping("/application-status")
     public HunterApplicationDTO changeApplicationStatus(@RequestParam String id, @RequestBody StatusDTO statusDTO) {
         return null;
-    }
-
-    @PostMapping("/closeApplication")
-    public void closeApplication(@RequestBody HunterApplicationDTO hunterApplicationDTO) {
-
     }
 }
