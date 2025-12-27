@@ -12,7 +12,6 @@ import java.util.Date;
 public class HunterApplication extends GenericEntity {
 
     @OneToOne
-    @JoinColumn(name = "hunter_response_id")
     private HunterResponse hunterResponse;
 
     @OneToOne
