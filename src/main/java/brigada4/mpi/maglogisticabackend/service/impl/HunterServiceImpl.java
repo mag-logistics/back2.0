@@ -31,14 +31,14 @@ public class HunterServiceImpl implements HunterService {
     public List<HunterApplicationDTO> getAllApplications() {
         return hunterApplicationRepository.findAll()
                 .stream()
-                .map(hunterApplicationMapper::toResponse)
+                .map(hunterApplicationMapper::toDTO)
                 .toList();
     }
 
     @Override
     public HunterApplicationDTO getApplicationById(String id) {
         return hunterApplicationRepository.findById(id)
-                .map(hunterApplicationMapper::toResponse)
+                .map(hunterApplicationMapper::toDTO)
                 .orElseThrow(() -> new NotFoundException("Application with id " + id + " not found"));
     }
 
