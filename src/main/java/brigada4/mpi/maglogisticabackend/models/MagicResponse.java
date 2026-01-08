@@ -11,14 +11,13 @@ import java.util.Date;
 @Table(name = "magic_responses")
 public class MagicResponse extends GenericEntity {
 
-    @OneToOne(mappedBy = "magicResponse", cascade = CascadeType.ALL)
-    private MagicApplication magicApp;
+    @Column(name = "magic_application_id")
+    private String magicApplicationId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "storekeeper_id", referencedColumnName = "id")
     private Storekeeper storekeeper;
 
-    @NotEmpty
     @Column(name = "response_date")
     private Date date;
 

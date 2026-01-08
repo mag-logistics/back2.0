@@ -11,4 +11,8 @@
     <include file="db.migrations/v-0.1/2025-12-20--add_magic_app_pattern.sql"/>
     <include file="db.migrations/v-0.1/2026-01-08-change_field_name.sql"/>
     <include file="db.migrations/v-0.1/2026-01-08-alter_fields_in_magic_application.sql"/>
+    <include file="db.migrations/v-0.1/2026-01-08-alter_fields_in_hunter_application.sql"/>
+    <include file="db.migrations/v-0.1/2026-01-08--alter_fields_in_extraction_application.sql"/>
+    <include file="db.migrations/v-0.1/2026-01-08--adding_magic_app_id_in_magic_response.sql"/>
+    <include file="db.migrations/v-0.1/2026-01-08--adding_magic_app_id_in_extr_app.sql"/>
 </databaseChangeLog>

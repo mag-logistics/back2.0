@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MagicApplicationRepository extends JpaRepository<MagicApplication, String> {
@@ -13,7 +14,6 @@ public interface MagicApplicationRepository extends JpaRepository<MagicApplicati
     List<MagicApplication> findAllByStatus(ApplicationStatus status);
 
     MagicApplication findByMagicResponseId(String magicResponseId);
-
 
     List<MagicApplication> findAllByMagicianId(String magicianId);
 

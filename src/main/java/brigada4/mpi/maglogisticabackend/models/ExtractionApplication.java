@@ -15,8 +15,9 @@ public class ExtractionApplication extends GenericEntity {
     @JoinColumn(name = "magic_id", referencedColumnName = "id")
     private Magic magic;
 
-    @OneToOne(mappedBy = "extractionApp", cascade = CascadeType.ALL, orphanRemoval = true)
-    private MagicApplication magicApp;
+//    @OneToOne(mappedBy = "extractionApp", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Column(name = "magic_app_id")
+    private String magicAppId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "storekeeper_id", referencedColumnName = "id")
@@ -32,15 +33,12 @@ public class ExtractionApplication extends GenericEntity {
     @Enumerated(EnumType.STRING)
     private ApplicationStatus status;
 
-    @NotEmpty
     @Column(name = "volume")
     private int volume;
 
-    @NotEmpty
     @Column(name = "init_date")
     private Date initDate;
 
-    @NotEmpty
     @Column(name = "deadline")
     private Date deadline;
 
