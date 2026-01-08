@@ -35,7 +35,7 @@ public class GeneralController {
     /**
      * 1. Получение всех животных
      */
-    @GetMapping
+    @GetMapping("getAnimals")
     public ResponseEntity<?> getAllAnimals() {
         List<AnimalDTO> animals = animalMapper.animalsToAnimalDTOList(generalSerivce.getAllAnimals());
         return ResponseEntity.ok(animals);
@@ -44,7 +44,7 @@ public class GeneralController {
     /**
      * 2. Получение всех магиий
      */
-    @GetMapping
+    @GetMapping("getAllMagic")
     public ResponseEntity<?> getAllMagic() {
         List<MagicDTO> magicList = magicMapper.magicDTOListFromMagicList(generalSerivce.getAllMagic());
         return ResponseEntity.ok(magicList);
