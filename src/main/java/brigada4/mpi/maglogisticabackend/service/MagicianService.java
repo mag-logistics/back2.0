@@ -63,12 +63,12 @@ public class MagicianService {
     }
 
     public List<MagicApplication> getAllMagicApp(String magicianId) {
-        return magicApplicationRepository.findAllByMagician(magicianId);
+        return magicApplicationRepository.findAllByMagicianId(magicianId);
     }
 
 
     public List<MagicAppPattern> getAllMagicAppPatterns(String magicianId) {
-        return magicAppPatternRepository.findAllByMagician(magicianId);
+        return magicAppPatternRepository.findAllByMagicianId(magicianId);
     }
 
     public List<Storekeeper> findAllStorekeepers() {

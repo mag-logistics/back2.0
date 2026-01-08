@@ -19,11 +19,9 @@ public class MagicAppPattern extends GenericEntity{
     @JoinColumn(name = "magic_id", referencedColumnName = "id")
     private Magic magic;
 
-    @NotEmpty
     @Column(name = "volume")
     private int volume;
 
-    @NotEmpty
     @Column(name = "deadline")
     private Date deadline;
 
