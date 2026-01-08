@@ -16,5 +16,5 @@ public class MagicDTO {
     private MagicColourDTO magicColour;
     private MagicStateDTO magicState;
     private MagicPowerDTO magicPower;
-    private MagicStorageDTO magicStorage;
+//    private MagicStorageDTO magicStorage;
 }

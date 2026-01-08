@@ -25,6 +25,7 @@ public class GeneralService {
     }
 
     public List<Magic> getAllMagic() {
-        return magicRepository.findAll();
+        List<Magic> magics = magicRepository.findAll();
+        return magics;
     }
 }
