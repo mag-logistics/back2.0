@@ -13,6 +13,6 @@ public class AnimalDTO {
     private String id;
     private String name;
     private MagicDTO magic;
-    private AnimalStorageDTO animalStorage;
+//    private AnimalStorageDTO animalStorage;
     private int magicVolume;
 }
