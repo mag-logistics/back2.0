@@ -9,4 +9,6 @@
     </changeSet>
     <include file="db.migrations/v-0.1/2025-12-19--add_points_in_user.sql"/>
     <include file="db.migrations/v-0.1/2025-12-20--add_magic_app_pattern.sql"/>
+    <include file="db.migrations/v-0.1/2026-01-08-change_field_name.sql"/>
+    <include file="db.migrations/v-0.1/2026-01-08-alter_fields_in_magic_application.sql"/>
 </databaseChangeLog>
