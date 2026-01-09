@@ -27,6 +27,10 @@ public class MagicApplication extends GenericEntity {
     @JoinColumn(name = "extraction_app_id")
     private ExtractionApplication extractionApp;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "storekeeper_id", referencedColumnName = "id")
+    private Storekeeper storekeeper;
+
     @Enumerated(EnumType.STRING)
     private ApplicationStatus status;
 

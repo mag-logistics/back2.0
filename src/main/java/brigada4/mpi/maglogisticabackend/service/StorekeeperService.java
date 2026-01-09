@@ -39,13 +39,7 @@ public class StorekeeperService {
 
 
     public List<MagicApplication> getMyMagicApplication(String storekeeperId) {
-        List<MagicResponse> responses = magicResponseRepository.findAllByStorekeeperId(storekeeperId);
-        List<MagicApplication> applications = new ArrayList<>();
-        for(MagicResponse response : responses) {
-            MagicApplication application = magicApplicationRepository.findByMagicResponseId(response.getId());
-            applications.add(application);
-        }
-        return applications;
+        return magicApplicationRepository.findAllByStorekeeperId(storekeeperId);
     }
 
     public List<MagicResponse> getMyMagicResponses(String storekeeperId) {
@@ -106,15 +100,23 @@ public class StorekeeperService {
         return magicApplication.getVolume() <= magicStorage.getVolume();
     }
 
+    @Transactional
     public void saveResponseInMagicApplication(String magicApplicationId, MagicResponse magicResponse) {
         MagicApplication magicApplication = magicApplicationRepository.findById(magicApplicationId).orElse(null);
         if (magicApplication == null) {
             return;
         }
         magicApplication.setMagicResponse(magicResponse);
+        magicApplication.setStatus(ApplicationStatus.FINISHED);
+        magicApplicationRepository.save(magicApplication);
+        MagicStorage magicStorage = magicStorageRepository.findByMagicId(magicApplication.getMagic().getId()).orElse(null);
+        if (magicStorage != null) {
+            magicStorage.setVolume(magicStorage.getVolume() - magicApplication.getVolume());
+        }
         magicApplicationRepository.save(magicApplication);
     }
 
+    @Transactional
     public void saveExtrAppInMagicApp(ExtractionApplicationDTO extractionApplicationDTO, ExtractionApplication extractionApplication) {
         MagicApplication magicApplication = magicApplicationRepository.findById(extractionApplicationDTO.magicApp().getId()).orElse(null);
         if (magicApplication == null) {
@@ -122,5 +124,17 @@ public class StorekeeperService {
         }
         magicApplication.setExtractionApp(extractionApplication);
         magicApplicationRepository.save(magicApplication);
+    }
+
+    @Transactional
+    public MagicApplication takeMagicApplication(String storekeeperId, String magicApplicationId) {
+        Storekeeper storekeeper = storekeeperRepository.findById(storekeeperId).orElse(null);
+        MagicApplication magicApplication = magicApplicationRepository.findById(magicApplicationId).orElse(null);
+        if (magicApplication == null || storekeeper == null) {
+            return null;
+        }
+        magicApplication.setStorekeeper(storekeeper);
+        magicApplication.setStatus(ApplicationStatus.WORKED);
+        return magicApplicationRepository.save(magicApplication);
     }
 }

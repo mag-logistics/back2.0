@@ -132,4 +132,16 @@ public class StorekeeperController {
         }
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/takeMagicApp")
+    public ResponseEntity<?> takeMagicApplication(@RequestParam String storekeeperId, @RequestParam String magicApplicationId) {
+        if (storekeeperId == null || storekeeperId.isEmpty() || magicApplicationId == null || magicApplicationId.isEmpty()) {
+            return ResponseEntity.badRequest().body("Parameters shouldn't be empty");
+        }
+        MagicApplicationDTO magicApplicationDTO = magicApplicationMapper.fromMagicApplication(storekeeperService.takeMagicApplication(storekeeperId, magicApplicationId));
+        if (magicApplicationDTO == null) {
+            return ResponseEntity.badRequest().body("MagicApp doesn't update");
+        }
+        return ResponseEntity.ok(magicApplicationDTO);
+    }
 }

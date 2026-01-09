@@ -14,6 +14,7 @@ public class MagicApplicationDTO {
     private MagicResponseDTO magicResponse;
     private MagicDTO magic;
     private ExtractionApplicationDTO extractionApp;
+    private StorekeeperDTO storekeeper;
     private ApplicationStatus status;
     private int volume;
     private Date initDate;
