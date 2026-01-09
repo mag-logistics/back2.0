@@ -12,6 +12,7 @@ import java.util.Date;
 public class ExtractionResponse extends GenericEntity {
 
     @OneToOne(mappedBy = "extractionResponse", cascade = CascadeType.ALL)
+    @JoinColumn(name = "application_id", nullable = false)
     private ExtractionApplication extractionApp;
 
     @ManyToOne(fetch = FetchType.EAGER)

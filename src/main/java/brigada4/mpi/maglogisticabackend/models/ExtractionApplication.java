@@ -24,7 +24,6 @@ public class ExtractionApplication extends GenericEntity {
     private Storekeeper storekeeper;
 
     @OneToOne
-    @JoinColumn(name = "extraction_response_id")
     private ExtractionResponse extractionResponse;
 
     @OneToOne(mappedBy = "extractionApp")

@@ -21,22 +21,19 @@ public class ExtractorController {
         this.extractorService = extractorService;
     }
 
-    @GetMapping("/getAllApplications")
+    @GetMapping("/applications")
     public List<ExtractionApplicationDTO> getAllApplications() {
         return extractorService.getAllApplications();
     }
 
-    @GetMapping("/getApplicationById")
-    public ExtractionApplicationDTO getApplicationById(@RequestParam String id) {
+    @GetMapping("/applications/{id}")
+    public ExtractionApplicationDTO getApplicationById(@PathVariable String id) {
         return extractorService.getApplicationById(id);
     }
 
-    @PostMapping("/createHunterApplication")
-    public HunterApplicationDTO createHunterApplication(
-            @PathVariable String extractorId,
-            @RequestBody CreateHunterApplicationRequest request
-    ) {
-        return extractorService.createHunterApplication(extractorId, request);
+    @PostMapping("/hunter-application")
+    public HunterApplicationDTO createHunterApplication(@RequestBody CreateHunterApplicationRequest request) {
+        return extractorService.createHunterApplication(request);
     }
 
 }

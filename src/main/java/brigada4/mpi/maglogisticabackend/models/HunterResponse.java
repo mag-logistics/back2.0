@@ -12,6 +12,7 @@ import java.util.Date;
 public class HunterResponse extends GenericEntity{
 
     @OneToOne(mappedBy = "hunterResponse", cascade = CascadeType.ALL)
+    @JoinColumn(name = "hunter_application_id")
     private HunterApplication hunterApp;
 
     @ManyToOne(fetch = FetchType.EAGER)
