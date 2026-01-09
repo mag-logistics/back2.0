@@ -30,15 +30,12 @@ public class MagicApplication extends GenericEntity {
     @Enumerated(EnumType.STRING)
     private ApplicationStatus status;
 
-    @NotEmpty
     @Column(name = "volume")
     private int volume;
 
-    @NotEmpty
     @Column(name = "init_date")
     private Date initDate;
 
-    @NotEmpty
     @Column(name = "deadline")
     private Date deadline;
 }

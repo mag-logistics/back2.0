@@ -4,12 +4,14 @@ import brigada4.mpi.maglogisticabackend.dto.ExtractionApplicationDTO;
 import brigada4.mpi.maglogisticabackend.dto.MagicApplicationDTO;
 import brigada4.mpi.maglogisticabackend.dto.MagicResponseDTO;
 import brigada4.mpi.maglogisticabackend.mapper.ExtractionApplicationMapper;
+import brigada4.mpi.maglogisticabackend.mapper.MagicMapper;
 import brigada4.mpi.maglogisticabackend.models.*;
 import brigada4.mpi.maglogisticabackend.repositories.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -63,7 +65,7 @@ public class StorekeeperService {
             return null;
         }
         magicResponse.setStorekeeper(storekeeper);
-        magicResponse.setMagicApp(magicApplication);
+        magicResponse.setMagicApplicationId(magicApplication.getId());
 
         magicResponse.setDate(magicResponseDTO.getDate());
 
@@ -78,11 +80,21 @@ public class StorekeeperService {
         }
 
         ExtractionApplication extractionApplication = extractionApplicationMapper.toEntity(extractionApplicationDTO);
+        MagicApplication magicApp = magicApplicationRepository.findById(extractionApplicationDTO.magicApp().getId()).orElse(null);
+        if (magicApp == null) {
+            return null;
+        }
+        extractionApplication.setMagicAppId(magicApp.getId());
+        Magic magic = magicApp.getMagic();
+        extractionApplication.setMagic(magic);
         extractionApplication.setStorekeeper(storekeeper);
+        Date date = new Date();
+        extractionApplication.setInitDate(date);
+        extractionApplication.setStatus(ApplicationStatus.CREATED);
         return extractionApplicationRepository.save(extractionApplication);
     }
 
-    public boolean checkMagicAvailability(String storekeeperId, String magicApplicationId) {
+    public boolean checkMagicAvailability(String magicApplicationId) {
         MagicApplication magicApplication = magicApplicationRepository.findById(magicApplicationId).orElse(null);
         if (magicApplication == null) {
             return false;
@@ -92,5 +104,23 @@ public class StorekeeperService {
             return false;
         }
         return magicApplication.getVolume() <= magicStorage.getVolume();
+    }
+
+    public void saveResponseInMagicApplication(String magicApplicationId, MagicResponse magicResponse) {
+        MagicApplication magicApplication = magicApplicationRepository.findById(magicApplicationId).orElse(null);
+        if (magicApplication == null) {
+            return;
+        }
+        magicApplication.setMagicResponse(magicResponse);
+        magicApplicationRepository.save(magicApplication);
+    }
+
+    public void saveExtrAppInMagicApp(ExtractionApplicationDTO extractionApplicationDTO, ExtractionApplication extractionApplication) {
+        MagicApplication magicApplication = magicApplicationRepository.findById(extractionApplicationDTO.magicApp().getId()).orElse(null);
+        if (magicApplication == null) {
+            return;
+        }
+        magicApplication.setExtractionApp(extractionApplication);
+        magicApplicationRepository.save(magicApplication);
     }
 }

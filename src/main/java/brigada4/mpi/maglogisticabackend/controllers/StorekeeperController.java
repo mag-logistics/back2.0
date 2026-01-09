@@ -6,6 +6,8 @@ import brigada4.mpi.maglogisticabackend.dto.MagicResponseDTO;
 import brigada4.mpi.maglogisticabackend.mapper.ExtractionApplicationMapper;
 import brigada4.mpi.maglogisticabackend.mapper.MagicApplicationMapper;
 import brigada4.mpi.maglogisticabackend.mapper.MagicResponseMapper;
+import brigada4.mpi.maglogisticabackend.models.ExtractionApplication;
+import brigada4.mpi.maglogisticabackend.models.MagicResponse;
 import brigada4.mpi.maglogisticabackend.service.StorekeeperService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -84,7 +86,9 @@ public class StorekeeperController {
         if (storekeeperId == null || storekeeperId.isEmpty() || magicApplicationId == null || magicApplicationId.isEmpty() || magicResponseDTO == null) {
             return ResponseEntity.badRequest().body("Parameters shouldn't be empty");
         }
-        MagicResponseDTO response = magicResponseMapper.magicResponseToMagicResponseDTO(storekeeperService.processMagicApplication(storekeeperId, magicApplicationId, magicResponseDTO));
+        MagicResponse magicResponse = storekeeperService.processMagicApplication(storekeeperId, magicApplicationId, magicResponseDTO);
+        storekeeperService.saveResponseInMagicApplication(magicApplicationId, magicResponse);
+        MagicResponseDTO response = magicResponseMapper.magicResponseToMagicResponseDTO(magicResponse);
         if (response == null) {
             return ResponseEntity.badRequest().body("MagicApp doesn't update");
         } else {
@@ -100,11 +104,11 @@ public class StorekeeperController {
      */
     @GetMapping("/checkMagicAvailability")
 //    @PreAuthorize("hasAuthority('ROLE_STOREKEEPER')")
-    public ResponseEntity<?> checkMagicAvailability(@RequestParam String storekeeperId, @RequestParam String magicApplicationId) {
-        if (storekeeperId == null || storekeeperId.isEmpty() || magicApplicationId == null || magicApplicationId.isEmpty()) {
+    public ResponseEntity<?> checkMagicAvailability(@RequestParam String magicApplicationId) {
+        if (magicApplicationId == null || magicApplicationId.isEmpty()) {
             return ResponseEntity.badRequest().body("Parameters shouldn't be empty");
         }
-        boolean response = storekeeperService.checkMagicAvailability(storekeeperId, magicApplicationId);
+        boolean response = storekeeperService.checkMagicAvailability(magicApplicationId);
         return ResponseEntity.ok(response);
     }
 
@@ -118,7 +122,11 @@ public class StorekeeperController {
             return ResponseEntity.badRequest().body("Parameters shouldn't be empty");
         }
 
-        ExtractionApplicationDTO response = extractionApplicationMapper.toDTO(storekeeperService.createExtractionApp(storekeeperId, extractionApplicationDTO));
+        ExtractionApplication extractionApplication = storekeeperService.createExtractionApp(storekeeperId, extractionApplicationDTO);
+        if (extractionApplication != null) {
+            storekeeperService.saveExtrAppInMagicApp(extractionApplicationDTO, extractionApplication);
+        }
+        ExtractionApplicationDTO response = extractionApplicationMapper.toDTO(extractionApplication);
         if (response == null) {
             return ResponseEntity.badRequest().body("ExtractionApp doesn't create");
         }

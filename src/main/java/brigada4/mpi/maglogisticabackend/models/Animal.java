@@ -21,6 +21,6 @@ public class Animal extends GenericEntity {
     @Column(name = "magic_volume")
     private int magicVolume;
 
-    @OneToOne(mappedBy = "animal")
-    private AnimalStorage animalStorage;
+//    @OneToOne(mappedBy = "animal")
+//    private AnimalStorage animalStorage;
 }
