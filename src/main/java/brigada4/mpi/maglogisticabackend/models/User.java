@@ -56,6 +56,9 @@ public class User extends GenericEntity {
     @Column(name = "penalty_points")
     private int penaltyPoints;
 
+    @Column(name = "tg_name")
+    private String tgName;
+
     public User() {
     }
 

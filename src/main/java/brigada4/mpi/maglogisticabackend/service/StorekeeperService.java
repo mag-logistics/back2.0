@@ -10,6 +10,11 @@ import brigada4.mpi.maglogisticabackend.repositories.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,14 +28,16 @@ public class StorekeeperService {
     private final ExtractionApplicationMapper extractionApplicationMapper;
     private final ExtractionApplicationRepository extractionApplicationRepository;
     private final MagicStorageRepository magicStorageRepository;
+    private final NotificationService notificationService;
 
-    public StorekeeperService(StorekeeperRepository storekeeperRepository, MagicApplicationRepository magicApplicationRepository, MagicResponseRepository magicResponseRepository, ExtractionApplicationMapper extractionApplicationMapper, ExtractionApplicationRepository extractionApplicationRepository, MagicStorageRepository magicStorageRepository) {
+    public StorekeeperService(StorekeeperRepository storekeeperRepository, MagicApplicationRepository magicApplicationRepository, MagicResponseRepository magicResponseRepository, ExtractionApplicationMapper extractionApplicationMapper, ExtractionApplicationRepository extractionApplicationRepository, MagicStorageRepository magicStorageRepository, NotificationService notificationService) {
         this.storekeeperRepository = storekeeperRepository;
         this.magicApplicationRepository = magicApplicationRepository;
         this.magicResponseRepository = magicResponseRepository;
         this.extractionApplicationMapper = extractionApplicationMapper;
         this.extractionApplicationRepository = extractionApplicationRepository;
         this.magicStorageRepository = magicStorageRepository;
+        this.notificationService = notificationService;
     }
 
     public List<MagicApplication> getAllMagicApplication() {
@@ -62,6 +69,10 @@ public class StorekeeperService {
         magicResponse.setMagicApplicationId(magicApplication.getId());
 
         magicResponse.setDate(magicResponseDTO.getDate());
+
+        if (magicApplication.getMagician().getEmail() != null) {
+            notificationService.sendMailAboutFinishingApplication(magicApplication.getMagician(), storekeeper);
+        }
 
         return magicResponseRepository.save(magicResponse);
     }
@@ -135,6 +146,7 @@ public class StorekeeperService {
         }
         magicApplication.setStorekeeper(storekeeper);
         magicApplication.setStatus(ApplicationStatus.WORKED);
+        notificationService.sendMailAboutWorkingApplication(magicApplication.getMagician(), storekeeper);
         return magicApplicationRepository.save(magicApplication);
     }
 }

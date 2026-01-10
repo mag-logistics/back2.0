@@ -19,4 +19,5 @@ public class UserDTO {
     private Date birthDate;
     private int rewardPoints;
     private int penaltyPoints;
+    private String tgName;
 }
