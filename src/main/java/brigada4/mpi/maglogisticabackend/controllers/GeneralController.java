@@ -93,5 +93,37 @@ public class GeneralController {
                 .body(new InputStreamResource(bis));
     }
 
+    /**
+     * Запрос на генерацию pdf отчета
+     * @param userId (id пользователя, который делает запрос на генерацию отчета)
+     * @param applicationId (id заявки, которую хотим обработать)
+     * @param applicationType (Magic / Extraction / Hunter)
+     * @return
+     */
+    @PostMapping("generateReportTwo")
+    public ResponseEntity<?> generateReportTwo(@RequestParam String userId, @RequestParam String applicationId, @RequestParam String applicationType) {
+        ByteArrayInputStream bis = null;
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "inline; filename=citiesreport.pdf");
+        switch (applicationType) {
+            case "Magic":
+                bis = magicianService.generateReportOne(userId, applicationId);
+                break;
+            case "Extraction":
+                bis = storekeeperService.generateReportOne(userId, applicationId);
+                break;
+            case "Hunter":
+                bis = extractorService.generateReportOne(userId, applicationId);
+                break;
+            default:
+                return ResponseEntity.badRequest().body("Не найдено соответствующей заявки");
+        }
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(new InputStreamResource(bis));
+    }
+
 
 }
