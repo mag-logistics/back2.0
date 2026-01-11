@@ -6,6 +6,7 @@ import brigada4.mpi.maglogisticabackend.payload.CreateHunterApplicationRequest;
 import brigada4.mpi.maglogisticabackend.repositories.ExtractorRepository;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 public interface ExtractorService {
@@ -16,4 +17,5 @@ public interface ExtractorService {
 
     HunterApplicationDTO createHunterApplication(CreateHunterApplicationRequest request);
 
+    ByteArrayInputStream generateReportOne(String userId, String applicationId);
 }
