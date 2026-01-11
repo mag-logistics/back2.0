@@ -16,4 +16,5 @@
     <include file="db.migrations/v-0.1/2026-01-08--adding_magic_app_id_in_magic_response.sql"/>
     <include file="db.migrations/v-0.1/2026-01-08--adding_magic_app_id_in_extr_app.sql"/>
     <include file="db.migrations/v-0.1/2026-01-09--adding_storekeeper_in_magic_app.sql"/>
+    <include file="db.migrations/v-0.1/2026-01-11--alter_applications_table.sql"/>
 </databaseChangeLog>

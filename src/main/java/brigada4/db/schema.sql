@@ -69,12 +69,6 @@ CREATE TABLE animal_storage
     FOREIGN KEY (animal_id) REFERENCES animals (id)
 );
 
--- CREATE TABLE application_status
--- (
---     id   varchar(36) NOT NULL PRIMARY KEY UNIQUE,
---     name varchar(15) NOT NULL UNIQUE
--- );
-
 CREATE TABLE extraction_applications
 (
     id                     varchar(36) NOT NULL PRIMARY KEY UNIQUE,
@@ -84,7 +78,6 @@ CREATE TABLE extraction_applications
     status_id              varchar(36) NOT NULL,
     storekeeper_id         varchar(36) NOT NULL,
     magic_id               varchar(36) NOT NULL,
---     FOREIGN KEY (status_id) REFERENCES application_status (id),
     FOREIGN KEY (storekeeper_id) REFERENCES storekeepers (id),
     FOREIGN KEY (magic_id) REFERENCES magic (id)
 );
@@ -145,7 +138,6 @@ CREATE TABLE magic_applications
     magic_id           varchar(36) NOT NULL,
     magic_response_id  varchar(36) NOT NULL,
     magician_id varchar(36) NOT NULL,
---     FOREIGN KEY (status_id) REFERENCES application_status (id),
     FOREIGN KEY (extraction_app_id) REFERENCES extraction_applications (id),
     FOREIGN KEY (magic_id) REFERENCES magic (id),
     FOREIGN KEY (magic_response_id) REFERENCES magic_responses (id),
