@@ -1,17 +1,16 @@
 package brigada4.mpi.maglogisticabackend.service.impl;
 
 import brigada4.mpi.maglogisticabackend.dto.ExtractionApplicationDTO;
+import brigada4.mpi.maglogisticabackend.dto.ExtractionResponseDTO;
 import brigada4.mpi.maglogisticabackend.dto.HunterApplicationDTO;
+import brigada4.mpi.maglogisticabackend.exception.ConflictException;
 import brigada4.mpi.maglogisticabackend.exception.NotFoundException;
 import brigada4.mpi.maglogisticabackend.mapper.ExtractionApplicationMapper;
+import brigada4.mpi.maglogisticabackend.mapper.ExtractionResponseMapper;
 import brigada4.mpi.maglogisticabackend.mapper.HunterApplicationMapper;
-import brigada4.mpi.maglogisticabackend.models.ApplicationStatus;
-import brigada4.mpi.maglogisticabackend.models.HunterApplication;
-import brigada4.mpi.maglogisticabackend.payload.CreateHunterApplicationRequest;
-import brigada4.mpi.maglogisticabackend.repositories.ExtractionApplicationRepository;
-import brigada4.mpi.maglogisticabackend.repositories.ExtractorRepository;
-import brigada4.mpi.maglogisticabackend.repositories.HunterApplicationRepository;
-import brigada4.mpi.maglogisticabackend.repositories.MagicRepository;
+import brigada4.mpi.maglogisticabackend.models.*;
+import brigada4.mpi.maglogisticabackend.payload.request.CreateHunterApplicationRequest;
+import brigada4.mpi.maglogisticabackend.repositories.*;
 import brigada4.mpi.maglogisticabackend.service.ExtractorService;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.font.PdfFont;
@@ -23,6 +22,8 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.UnitValue;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,28 +36,54 @@ import java.util.List;
 @Service
 public class ExtractorServiceImpl implements ExtractorService {
 
-//    private final ExtractorRepository extractorRepository;
-    private final ExtractionApplicationRepository extractionApplicationRepository;
-    private final ExtractionApplicationMapper extractionApplicationMapper;
+    @Autowired
+    private UserRepository userRepository;
 
-    private final HunterApplicationRepository hunterApplicationRepository;
-    private final HunterApplicationMapper hunterApplicationMapper;
+    @Autowired
+    private ExtractionApplicationRepository extractionApplicationRepository;
 
-    private final MagicRepository magicRepository;
+    @Autowired
+    private ExtractionApplicationMapper extractionApplicationMapper;
 
+    @Autowired
+    private HunterApplicationRepository hunterApplicationRepository;
 
-    public ExtractorServiceImpl(/*ExtractorRepository extractorRepository,*/ ExtractionApplicationRepository extractionApplicationRepository, ExtractionApplicationMapper extractionApplicationMapper, HunterApplicationMapper hunterApplicationMapper, HunterApplicationRepository hunterApplicationRepository, MagicRepository magicRepository) {
-//        this.extractorRepository = extractorRepository;
-        this.magicRepository = magicRepository;
-        this.extractionApplicationRepository = extractionApplicationRepository;
-        this.extractionApplicationMapper = extractionApplicationMapper;
-        this.hunterApplicationMapper = hunterApplicationMapper;
-        this.hunterApplicationRepository = hunterApplicationRepository;
-    }
+    @Autowired
+    private HunterApplicationMapper hunterApplicationMapper;
+
+    @Autowired
+    private ExtractionResponseMapper extractionResponseMapper;
+
+    @Autowired
+    private MagicRepository magicRepository;
+
+    @Autowired
+    private ExtractorRepository extractorRepository;
+
+    @Autowired
+    private ExtractionResponseRepository extractionResponseRepository;
+
 
     @Override
     public List<ExtractionApplicationDTO> getAllApplications() {
-        return extractionApplicationRepository.findAll()
+        List<ExtractionApplication> list = extractionApplicationRepository.findAll();
+
+        if (list.isEmpty()) {
+            throw new NotFoundException("Заявки не найдены");
+        }
+
+        return list
+                .stream()
+                .map(extractionApplicationMapper::toDTO)
+                .toList();
+    }
+
+    @Override
+    public List<ExtractionApplicationDTO> getMyApplications(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Кладовщик " + email +" не найден"));
+
+        return extractionApplicationRepository.findAllByExtractorId(user.getId())
                 .stream()
                 .map(extractionApplicationMapper::toDTO)
                 .toList();
@@ -66,29 +93,72 @@ public class ExtractorServiceImpl implements ExtractorService {
     public ExtractionApplicationDTO getApplicationById(String id) {
         return extractionApplicationRepository.findById(id)
                 .map(extractionApplicationMapper::toDTO)
-                .orElseThrow(() -> new NotFoundException("Application with id " + id + " not found"));
+                .orElseThrow(() -> new NotFoundException("Заявка " + id + " не найдена"));
     }
 
     @Override
     @Transactional
-    public HunterApplicationDTO createHunterApplication(CreateHunterApplicationRequest request) {
-//        extractorRepository.findById(id)
-//                .orElseThrow(() -> new NotFoundException("Extractor with id " + id + " not found"));
+    public HunterApplicationDTO createHunterApplication(String email, CreateHunterApplicationRequest request) {
 
         magicRepository.findById(request.magicId())
-                .orElseThrow(() -> new NotFoundException("Magic with id " + request.magicId() + " not found"));
+                .orElseThrow(() -> new NotFoundException("Магия " + request.magicId() + " не найдена"));
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Пользователь " + email + " не найден"));
+
+        Extractor extractor = extractorRepository.findById(user.getId())
+                .orElseThrow(() -> new NotFoundException("Высасыватель " + user.getId() + " не найден"));
 
         HunterApplication hunterApplication = hunterApplicationMapper.toEntity(request);
-
+        hunterApplication.setExtractor(extractor);
         Date date = new Date();
-        hunterApplication.setInitDate(new Date());
+        hunterApplication.setInitDate(date);
         hunterApplication.setStatus(ApplicationStatus.CREATED);
-        date.setTime(date.getTime() + 24 * 60 * 60 * 1000);
 
         hunterApplicationRepository.save(hunterApplication);
 
         return hunterApplicationMapper.toDTO(hunterApplication);
     }
+
+    @Override
+    @Transactional
+    public ExtractionApplicationDTO takeApplication(String email, String application_id) {
+        ExtractionApplication app = extractionApplicationRepository.findById(application_id)
+                .orElseThrow(() -> new NotFoundException("Заявка " + application_id + "не найдена "));
+
+        if (app.getExtractor() != null) {
+            throw new ConflictException("Заявка уже взята");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Пользователь " + email + " не найден"));
+
+        Extractor extractor = extractorRepository.findById(user.getId())
+                        .orElseThrow(() -> new NotFoundException("Высасыватель " + user.getId() + " не найден"));
+
+
+        app.setExtractor(extractor);
+        app.setStatus(ApplicationStatus.WORKED);
+
+        extractionApplicationRepository.save(app);
+
+        return extractionApplicationMapper.toDTO(app);
+    }
+
+    @Override
+    public List<ExtractionResponseDTO> getExtractionResponses(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Пользователь " + email + " не найден"));
+
+        Extractor extractor = extractorRepository.findById(user.getId())
+                .orElseThrow(() -> new NotFoundException("Кладовщик " + user.getId() + " не найден"));
+
+        return extractionResponseRepository.findAllByExtractorId(extractor.getId())
+                .stream()
+                .map(extractionResponseMapper::toDTO)
+                .toList();
+    }
+
 
     @Override
     @Transactional
