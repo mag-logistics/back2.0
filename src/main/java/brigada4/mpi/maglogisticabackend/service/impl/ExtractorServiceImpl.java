@@ -146,7 +146,7 @@ public class ExtractorServiceImpl implements ExtractorService {
     }
 
     @Override
-    public List<ExtractionResponseDTO> getExtractionResponses(String email) {
+    public List<ExtractionResponseDTO> getMyResponses(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("Пользователь " + email + " не найден"));
 

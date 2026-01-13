@@ -21,7 +21,7 @@ public interface ExtractorService {
 
     ExtractionApplicationDTO takeApplication(String email, String application_id);
 
-    List<ExtractionResponseDTO> getExtractionResponses(String email);
+    List<ExtractionResponseDTO> getMyResponses(String email);
 
     ByteArrayInputStream generateReportOne(String userId, String applicationId);
 

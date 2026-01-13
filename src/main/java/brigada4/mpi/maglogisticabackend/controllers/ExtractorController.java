@@ -55,8 +55,8 @@ public class ExtractorController {
 
     @PostMapping("/my-responses")
     @ResponseStatus(HttpStatus.OK)
-    public List<ExtractionResponseDTO> getExtractionResponses(Authentication authentication) {
-        return extractorService.getExtractionResponses(authentication.getName());
+    public List<ExtractionResponseDTO> getMyResponses(Authentication authentication) {
+        return extractorService.getMyResponses(authentication.getName());
     }
 
 }
