@@ -53,7 +53,7 @@ public class ExtractorController {
         return extractorService.takeApplication(authentication.getName(), id);
     }
 
-    @PostMapping("/my-responses")
+    @GetMapping("/my-responses")
     @ResponseStatus(HttpStatus.OK)
     public List<ExtractionResponseDTO> getMyResponses(Authentication authentication) {
         return extractorService.getMyResponses(authentication.getName());
