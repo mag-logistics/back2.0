@@ -151,7 +151,7 @@ public class ExtractorServiceImpl implements ExtractorService {
                 .orElseThrow(() -> new NotFoundException("Пользователь " + email + " не найден"));
 
         Extractor extractor = extractorRepository.findById(user.getId())
-                .orElseThrow(() -> new NotFoundException("Кладовщик " + user.getId() + " не найден"));
+                .orElseThrow(() -> new NotFoundException("Высасыватель " + user.getId() + " не найден"));
 
         return extractionResponseRepository.findAllByExtractorId(extractor.getId())
                 .stream()
