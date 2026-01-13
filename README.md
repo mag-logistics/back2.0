@@ -1,6 +1,5 @@
 # User Service
 
-## Высасыватель
 ### Аутентификация
 API:
 ```
@@ -29,6 +28,7 @@ RESPONSE BODY:
 }
 ```
 
+## Высасыватель
 ### Получить список ВСЕХ заявок
 API:
 ```
@@ -117,7 +117,91 @@ RESPONSE BODY:
 ### Получить все свои выполненные заявки
 API:
 ```
-POST http://localhost:8080/api/v1/extractor/my-responses
+GET http://localhost:8080/api/v1/extractor/my-responses
+```
+
+Headers:
+```
+Authorization: Bearer *jwt-token*
+```
+
+REQUEST BODY: нет
+
+RESPONSE BODY:
+```
+
+```
+
+
+
+
+## Охотник
+### Получить список ВСЕХ заявок
+API:
+```
+GET http://localhost:8080/api/v1/hunter/applications
+```
+
+REQUEST BODY: нет
+
+RESPONSE BODY:
+```
+
+```
+
+### Получить список заявок, закрепленных к охотнику
+API:
+```
+GET http://localhost:8080/api/v1/hunter/my-applications
+```
+
+Headers:
+```
+Authorization: Bearer *jwt-token*
+```
+
+REQUEST BODY: нет
+
+RESPONSE BODY:
+```
+
+```
+
+### Получить заявку по id
+API:
+```
+GET http://localhost:8080/api/v1/hunter/applications/{id}
+```
+
+REQUEST BODY: нет
+
+RESPONSE BODY:
+```
+
+```
+
+
+### Взять на себя заявку
+API:
+```
+POST http://localhost:8080/api/v1/hunter/applications/{id}/take
+```
+
+Headers:
+```
+Authorization: Bearer *jwt-token*
+```
+
+REQUEST BODY: нет
+
+RESPONSE BODY:
+```
+
+```
+### Получить все свои выполненные заявки
+API:
+```
+GET http://localhost:8080/api/v1/hunter/my-responses
 ```
 
 Headers:
