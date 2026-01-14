@@ -11,7 +11,9 @@ import java.util.Date;
 @Table(name = "hunter_application")
 public class HunterApplication extends GenericEntity {
 
+//    @OneToOne
     @OneToOne
+    @JoinColumn(name = "hunter_response_id")
     private HunterResponse hunterResponse;
 
     @Column(name = "extraction_app_id")
