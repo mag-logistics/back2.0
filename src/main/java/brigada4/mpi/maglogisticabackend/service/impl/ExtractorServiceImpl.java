@@ -118,7 +118,7 @@ public class ExtractorServiceImpl implements ExtractorService {
                 .orElseThrow(() -> new NotFoundException("Высасыватель " + user.getId() + " не найден"));
 
         HunterApplication hunterApplication = hunterApplicationMapper.toEntity(request);
-        hunterApplication.setExtractionApp(extractionApplication);
+        hunterApplication.setExtractionAppId(extrAppId);
         hunterApplication.setExtractor(extractor);
         hunterApplication.setMagic(magic);
         hunterApplication.setAnimal(animal);

@@ -14,9 +14,11 @@ public class HunterApplication extends GenericEntity {
     @OneToOne
     private HunterResponse hunterResponse;
 
-    @OneToOne
-    @JoinColumn(name = "extraction_app_id")
-    private ExtractionApplication extractionApp;
+    @Column(name = "extraction_app_id")
+    private String extractionAppId;
+//    @OneToOne
+//    @JoinColumn(name = "extraction_app_id")
+//    private ExtractionApplication extractionApp;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "magic_id", referencedColumnName = "id")
