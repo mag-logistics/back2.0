@@ -17,7 +17,7 @@ public interface ExtractorService {
 
     ExtractionApplicationDTO getApplicationById(String id);
 
-    HunterApplicationDTO createHunterApplication(String email, CreateHunterApplicationRequest request);
+    HunterApplicationDTO createHunterApplication(String email, String extrAppId, CreateHunterApplicationRequest request);
 
     ExtractionApplicationDTO takeApplication(String email, String application_id);
 

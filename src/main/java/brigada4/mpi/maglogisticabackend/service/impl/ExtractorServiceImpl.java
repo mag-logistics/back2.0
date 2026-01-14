@@ -100,7 +100,10 @@ public class ExtractorServiceImpl implements ExtractorService {
 
     @Override
     @Transactional
-    public HunterApplicationDTO createHunterApplication(String email, CreateHunterApplicationRequest request) {
+    public HunterApplicationDTO createHunterApplication(String email, String extrAppId, CreateHunterApplicationRequest request) {
+
+        ExtractionApplication extractionApplication = extractionApplicationRepository.findById(extrAppId)
+                .orElseThrow(() -> new NotFoundException("ExtractionApp " + extrAppId + " не найдена"));
 
         Magic magic = magicRepository.findById(request.magicId())
                 .orElseThrow(() -> new NotFoundException("Магия " + request.magicId() + " не найдена"));
@@ -115,6 +118,7 @@ public class ExtractorServiceImpl implements ExtractorService {
                 .orElseThrow(() -> new NotFoundException("Высасыватель " + user.getId() + " не найден"));
 
         HunterApplication hunterApplication = hunterApplicationMapper.toEntity(request);
+        hunterApplication.setExtractionAppId(extrAppId);
         hunterApplication.setExtractor(extractor);
         hunterApplication.setMagic(magic);
         hunterApplication.setAnimal(animal);

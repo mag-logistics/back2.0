@@ -30,7 +30,9 @@ public class ExtractionApplication extends GenericEntity {
     @OneToOne
     private ExtractionResponse extractionResponse;
 
-    @OneToOne(mappedBy = "extractionApp")
+    @OneToOne
+    @JoinColumn(name = "hunter_app_id")
+//    @OneToOne(mappedBy = "extractionApp")
     private HunterApplication hunterApp;
 
     @Enumerated(EnumType.STRING)
