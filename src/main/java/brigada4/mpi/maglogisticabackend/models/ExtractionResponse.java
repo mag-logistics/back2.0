@@ -18,7 +18,7 @@ public class ExtractionResponse extends GenericEntity {
 //    @OneToOne(mappedBy = "extractionResponse", cascade = CascadeType.ALL)
 //    @JoinColumn(name = "application_id", nullable = false)
 //    private ExtractionApplication extractionApp;
-    @Column(name = "extractino_application_id")
+    @Column(name = "extraction_application_id")
     private String extractionAppId;
 
     @ManyToOne(fetch = FetchType.EAGER)
