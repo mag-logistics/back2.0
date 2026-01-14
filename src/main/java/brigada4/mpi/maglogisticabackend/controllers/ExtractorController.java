@@ -43,8 +43,8 @@ public class ExtractorController {
 
     @PostMapping("/hunter-application")
     @ResponseStatus(HttpStatus.CREATED)
-    public HunterApplicationDTO createHunterApplication(Authentication authentication, @RequestBody CreateHunterApplicationRequest request) {
-        return extractorService.createHunterApplication(authentication.getName(), request);
+    public HunterApplicationDTO createHunterApplication(Authentication authentication, @RequestParam String extrAppId, @RequestBody CreateHunterApplicationRequest request) {
+        return extractorService.createHunterApplication(authentication.getName(), extrAppId, request);
     }
 
     @PostMapping("/applications/{id}/take")
