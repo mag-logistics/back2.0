@@ -25,6 +25,8 @@ public interface ExtractorService {
 
     ExtractionResponseDTO completeApplication(String name, String application_id);
 
+    Boolean canCollectMagic(String applicationId);
+
     ByteArrayInputStream generateReportOne(String userId, String applicationId);
 }
 
