@@ -15,7 +15,6 @@ public class MagicStorage extends GenericEntity {
     @JoinColumn(name = "magic_id")
     private Magic magic;
 
-    @NotEmpty
     @Column(name = "volume")
     private int volume;
 

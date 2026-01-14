@@ -19,7 +19,6 @@ public class ExtractionResponse extends GenericEntity {
     @JoinColumn(name = "extractor_id", referencedColumnName = "id")
     private Extractor extractor;
 
-    @NotEmpty
     @Column(name = "response_date")
     private Date date;
 
