@@ -17,4 +17,6 @@ public interface MagicApplicationRepository extends JpaRepository<MagicApplicati
 
     List<MagicApplication> findAllByMagicianId(String magicianId);
 
+    List<MagicApplication> findAllByStorekeeperId(String storekeeperId);
+
 }
