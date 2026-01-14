@@ -30,7 +30,7 @@ public class HunterController {
     }
 
 
-    @GetMapping("/my-appplications")
+    @GetMapping("/my-applications")
     @ResponseStatus(HttpStatus.OK)
     public List<HunterApplicationDTO> getMyApplications(Authentication authentication) {
         return hunterService.getMyApplications(authentication.getName());
