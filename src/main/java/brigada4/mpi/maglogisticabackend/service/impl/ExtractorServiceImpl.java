@@ -232,6 +232,7 @@ public class ExtractorServiceImpl implements ExtractorService {
         extractionResponseRepository.save(extractionResponse);
 
         app.setExtractionResponse(extractionResponse);
+        app.setStatus(ApplicationStatus.FINISHED);
 
         extractionApplicationRepository.save(app);
 
