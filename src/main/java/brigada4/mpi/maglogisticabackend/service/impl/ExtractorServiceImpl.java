@@ -12,6 +12,7 @@ import brigada4.mpi.maglogisticabackend.models.*;
 import brigada4.mpi.maglogisticabackend.payload.request.CreateHunterApplicationRequest;
 import brigada4.mpi.maglogisticabackend.repositories.*;
 import brigada4.mpi.maglogisticabackend.service.ExtractorService;
+import brigada4.mpi.maglogisticabackend.service.NotificationService;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
@@ -72,6 +73,9 @@ public class ExtractorServiceImpl implements ExtractorService {
 
     @Autowired
     private AnimalStorageRepository animalStorageRepository;
+
+    @Autowired
+    private NotificationService  notificationService;
 
 
     @Override
@@ -230,6 +234,8 @@ public class ExtractorServiceImpl implements ExtractorService {
         app.setExtractionResponse(extractionResponse);
 
         extractionApplicationRepository.save(app);
+
+        notificationService.sendMailAboutFinishingApplication(app.getStorekeeper(), app.getExtractor());
 
         return extractionResponseMapper.toDTO(extractionResponse);
     }
