@@ -224,7 +224,7 @@ public class ExtractorServiceImpl implements ExtractorService {
         magicStorageRepository.save(magicStorage);
 
         ExtractionResponse extractionResponse = new ExtractionResponse(
-                app,
+                app.getId(),
                 app.getExtractor(),
                 new Date()
         );

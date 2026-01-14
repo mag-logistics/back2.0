@@ -9,7 +9,7 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExtractionResponseDTO {
     private String id;
-    private ExtractionApplicationDTO extractionApp;
+    private String extractionAppId;
     private ExtractorDTO extractor;
     private Date date;
 }

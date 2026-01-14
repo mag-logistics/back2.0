@@ -27,7 +27,9 @@ public class ExtractionApplication extends GenericEntity {
     @JoinColumn(name = "extractor_id", referencedColumnName = "id")
     private Extractor extractor;
 
+    //    @OneToOne
     @OneToOne
+    @JoinColumn(name = "extraction_response_id")
     private ExtractionResponse extractionResponse;
 
     @OneToOne
