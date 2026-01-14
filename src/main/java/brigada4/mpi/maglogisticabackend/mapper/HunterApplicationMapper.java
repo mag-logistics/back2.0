@@ -2,9 +2,8 @@ package brigada4.mpi.maglogisticabackend.mapper;
 
 import brigada4.mpi.maglogisticabackend.dto.HunterApplicationDTO;
 import brigada4.mpi.maglogisticabackend.models.HunterApplication;
-import brigada4.mpi.maglogisticabackend.payload.CreateHunterApplicationRequest;
+import brigada4.mpi.maglogisticabackend.payload.request.CreateHunterApplicationRequest;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 import java.util.List;
 

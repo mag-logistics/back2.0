@@ -23,6 +23,10 @@ public class ExtractionApplication extends GenericEntity {
     @JoinColumn(name = "storekeeper_id", referencedColumnName = "id")
     private Storekeeper storekeeper;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "extractor_id", referencedColumnName = "id")
+    private Extractor extractor;
+
     @OneToOne
     private ExtractionResponse extractionResponse;
 

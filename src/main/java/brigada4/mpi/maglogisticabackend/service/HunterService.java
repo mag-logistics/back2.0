@@ -1,6 +1,7 @@
 package brigada4.mpi.maglogisticabackend.service;
 
 import brigada4.mpi.maglogisticabackend.dto.HunterApplicationDTO;
+import brigada4.mpi.maglogisticabackend.dto.HunterResponseDTO;
 import brigada4.mpi.maglogisticabackend.dto.StatusDTO;
 import brigada4.mpi.maglogisticabackend.models.HunterApplication;
 import brigada4.mpi.maglogisticabackend.repositories.HunterRepository;
@@ -15,5 +16,9 @@ public interface HunterService {
 
     HunterApplicationDTO getApplicationById(String id);
 
-    HunterApplicationDTO changeApplicationStatus(String id, StatusDTO statusDTO) throws IllegalAccessException;
+    List<HunterApplicationDTO> getMyApplications(String email);
+
+    HunterApplicationDTO takeApplication(String email, String id);
+
+    List<HunterResponseDTO> getMyResponses(String email);
 }

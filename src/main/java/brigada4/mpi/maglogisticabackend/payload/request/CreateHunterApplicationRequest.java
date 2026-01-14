@@ -1,9 +1,10 @@
-package brigada4.mpi.maglogisticabackend.payload;
+package brigada4.mpi.maglogisticabackend.payload.request;
 
 import java.util.Date;
 
 public record CreateHunterApplicationRequest(
         String magicId,
+        String animalId,
         int volume,
         Date deadline
 ) {}

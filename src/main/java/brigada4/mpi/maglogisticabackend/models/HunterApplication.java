@@ -26,6 +26,10 @@ public class HunterApplication extends GenericEntity {
     @JoinColumn(name = "extractor_id", referencedColumnName = "id")
     private Extractor extractor;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hunter_id", referencedColumnName = "id")
+    private Hunter hunter;
+
     @Enumerated(EnumType.STRING)
     private ApplicationStatus status;
 

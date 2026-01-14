@@ -24,6 +24,16 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleConflictException(ConflictException ex) {
+        return new ErrorResponse(
+                "CONFLICT",
+                ex.getMessage(),
+                Instant.now()
+        );
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(Exception ex) {

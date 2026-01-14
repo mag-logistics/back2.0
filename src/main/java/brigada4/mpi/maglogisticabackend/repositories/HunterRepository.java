@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface HunterRepository extends JpaRepository<Hunter, String> {
 
     Optional<Hunter> findById(String hunterId);
+
+
 }

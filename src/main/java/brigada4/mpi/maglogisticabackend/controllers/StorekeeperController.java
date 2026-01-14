@@ -8,6 +8,7 @@ import brigada4.mpi.maglogisticabackend.mapper.MagicApplicationMapper;
 import brigada4.mpi.maglogisticabackend.mapper.MagicResponseMapper;
 import brigada4.mpi.maglogisticabackend.models.ExtractionApplication;
 import brigada4.mpi.maglogisticabackend.models.MagicResponse;
+import brigada4.mpi.maglogisticabackend.service.NotificationService;
 import brigada4.mpi.maglogisticabackend.service.StorekeeperService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,12 +23,14 @@ public class StorekeeperController {
     private final MagicApplicationMapper magicApplicationMapper;
     private final MagicResponseMapper magicResponseMapper;
     private final ExtractionApplicationMapper extractionApplicationMapper;
+    private final NotificationService notificationService;
 
-    public StorekeeperController(StorekeeperService storekeeperService, MagicApplicationMapper magicApplicationMapper, MagicResponseMapper magicResponseMapper, ExtractionApplicationMapper extractionApplicationMapper) {
+    public StorekeeperController(StorekeeperService storekeeperService, MagicApplicationMapper magicApplicationMapper, MagicResponseMapper magicResponseMapper, ExtractionApplicationMapper extractionApplicationMapper, NotificationService notificationService) {
         this.storekeeperService = storekeeperService;
         this.magicApplicationMapper = magicApplicationMapper;
         this.magicResponseMapper = magicResponseMapper;
         this.extractionApplicationMapper = extractionApplicationMapper;
+        this.notificationService = notificationService;
     }
 
     /**
