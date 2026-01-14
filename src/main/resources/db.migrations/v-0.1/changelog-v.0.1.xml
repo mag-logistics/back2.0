@@ -22,4 +22,5 @@
     <include file="db.migrations/v-0.1/2026-01-14--alter_hunter_application.sql"/>
     <include file="db.migrations/v-0.1/2026-01-14--sex_id_not_null_in_user.sql"/>
     <include file="db.migrations/v-0.1/2026-01-14--alter_extr_app.sql"/>
+    <include file="db.migrations/v-0.1/2026-01-14--add_hunter_response_id.sql"/>
 </databaseChangeLog>
