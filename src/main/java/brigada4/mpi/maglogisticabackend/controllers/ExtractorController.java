@@ -29,7 +29,7 @@ public class ExtractorController {
         return extractorService.getAllApplications();
     }
 
-    @GetMapping("/my-application")
+    @GetMapping("/my-applications")
     @ResponseStatus(HttpStatus.OK)
     public List<ExtractionApplicationDTO> getMyApplications(Authentication authentication) {
         return extractorService.getMyApplications(authentication.getName());

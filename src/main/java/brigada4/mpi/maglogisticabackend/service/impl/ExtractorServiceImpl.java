@@ -79,7 +79,7 @@ public class ExtractorServiceImpl implements ExtractorService {
     @Override
     public List<ExtractionApplicationDTO> getMyApplications(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("Кладовщик " + email +" не найден"));
+                .orElseThrow(() -> new NotFoundException("Пользователь " + email +" не найден"));
 
         return extractionApplicationRepository.findAllByExtractorId(user.getId())
                 .stream()
@@ -97,9 +97,6 @@ public class ExtractorServiceImpl implements ExtractorService {
     @Override
     @Transactional
     public HunterApplicationDTO createHunterApplication(String email, String extrAppId, CreateHunterApplicationRequest request) {
-
-        ExtractionApplication extractionApplication = extractionApplicationRepository.findById(extrAppId)
-                .orElseThrow(() -> new NotFoundException("ExtractionApp " + extrAppId + " не найдена"));
 
         Magic magic = magicRepository.findById(request.magicId())
                 .orElseThrow(() -> new NotFoundException("Магия " + request.magicId() + " не найдена"));
