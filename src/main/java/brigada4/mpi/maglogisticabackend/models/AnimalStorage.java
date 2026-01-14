@@ -13,7 +13,6 @@ public class AnimalStorage extends GenericEntity {
     @JoinColumn(name = "animal_id")
     private Animal animal;
 
-    @NotEmpty
     @Column(name = "quantity")
     private int quantity;
 

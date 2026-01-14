@@ -34,7 +34,6 @@ public class HunterApplication extends GenericEntity {
     private ApplicationStatus status;
 
     //Данные, которые заполняет высасыватель в форме заявки
-    @NotEmpty
     @Column(name = "animal_count")
     private int animalCount;
 
@@ -42,11 +41,9 @@ public class HunterApplication extends GenericEntity {
     @JoinColumn(name="animal_id", referencedColumnName = "id")
     private Animal animal;
 
-    @NotEmpty
     @Column(name = "init_date")
     private Date initDate;
 
-    @NotEmpty
     @Column(name = "deadline")
     private Date deadline;
 }

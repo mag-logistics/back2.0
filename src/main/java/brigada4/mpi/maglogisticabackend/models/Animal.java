@@ -17,7 +17,6 @@ public class Animal extends GenericEntity {
     @JoinColumn(name = "magic_id", referencedColumnName = "id")
     private Magic magic;
 
-    @NotEmpty
     @Column(name = "magic_volume")
     private int magicVolume;
 
