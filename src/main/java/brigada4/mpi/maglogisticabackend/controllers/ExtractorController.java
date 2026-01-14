@@ -59,4 +59,10 @@ public class ExtractorController {
         return extractorService.getMyResponses(authentication.getName());
     }
 
+    @PostMapping("/applications/{id}/complete")
+    @ResponseStatus(HttpStatus.OK)
+    public ExtractionResponseDTO completeApplication(Authentication authentication, @PathVariable String id) {
+        return extractorService.completeApplication(authentication.getName(), id);
+    }
+
 }

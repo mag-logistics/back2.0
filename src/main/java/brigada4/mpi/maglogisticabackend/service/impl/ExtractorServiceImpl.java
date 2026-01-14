@@ -30,8 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class ExtractorServiceImpl implements ExtractorService {
@@ -62,8 +63,15 @@ public class ExtractorServiceImpl implements ExtractorService {
 
     @Autowired
     private ExtractionResponseRepository extractionResponseRepository;
+
     @Autowired
     private AnimalRepository animalRepository;
+
+    @Autowired
+    private MagicStorageRepository magicStorageRepository;
+
+    @Autowired
+    private AnimalStorageRepository animalStorageRepository;
 
 
     @Override
@@ -161,6 +169,69 @@ public class ExtractorServiceImpl implements ExtractorService {
                 .stream()
                 .map(extractionResponseMapper::toDTO)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public ExtractionResponseDTO completeApplication(String name, String applicationId) {
+
+        ExtractionApplication app = extractionApplicationRepository.findById(applicationId)
+                .orElseThrow(() -> new NotFoundException("Заявка " + applicationId + " не найдена"));
+
+        Magic magic = app.getMagic();
+        int requiredVolume = app.getVolume();
+
+        MagicStorage magicStorage = magicStorageRepository.findByMagicId(magic.getId())
+                .orElseThrow(() -> new NotFoundException(
+                        "Хранилище для магии " + magic.getId() + " не найдено"));
+
+        List<Animal> animals = animalRepository.findByMagicId(magic.getId());
+        List<AnimalStorage> animalStorages = animalStorageRepository.findAll();
+
+        Map<String, AnimalStorage> storageByAnimalId = animalStorages.stream()
+                .collect(Collectors.toMap(
+                        s -> s.getAnimal().getId(),
+                        Function.identity()
+                ));
+
+        List<Animal> animalsInStorage = animals.stream()
+                .filter(a -> storageByAnimalId.containsKey(a.getId()))
+                .toList();
+
+        int collectedVolume = 0;
+
+        for (Animal animal : animalsInStorage) {
+            if (collectedVolume >= requiredVolume) break;
+
+            AnimalStorage storage = storageByAnimalId.get(animal.getId());
+            int availableCount = storage.getQuantity();
+            int volumePerAnimal = animal.getMagicVolume();
+
+            while (availableCount > 0 && collectedVolume < requiredVolume) {
+                collectedVolume += volumePerAnimal;
+                availableCount--;
+            }
+
+            storage.setQuantity(availableCount);
+            animalStorageRepository.save(storage);
+        }
+
+        magicStorage.setVolume(magicStorage.getVolume() + requiredVolume);
+        magicStorageRepository.save(magicStorage);
+
+        ExtractionResponse extractionResponse = new ExtractionResponse(
+                app,
+                app.getExtractor(),
+                new Date()
+        );
+
+        extractionResponseRepository.save(extractionResponse);
+
+        app.setExtractionResponse(extractionResponse);
+
+        extractionApplicationRepository.save(app);
+
+        return extractionResponseMapper.toDTO(extractionResponse);
     }
 
 

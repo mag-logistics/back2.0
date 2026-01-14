@@ -23,7 +23,8 @@ public interface ExtractorService {
 
     List<ExtractionResponseDTO> getMyResponses(String email);
 
-    ByteArrayInputStream generateReportOne(String userId, String applicationId);
+    ExtractionResponseDTO completeApplication(String name, String application_id);
 
+    ByteArrayInputStream generateReportOne(String userId, String applicationId);
 }
 
