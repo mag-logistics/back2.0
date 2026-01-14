@@ -46,7 +46,7 @@ public class HunterServiceImpl implements HunterService {
 
     @Override
     public List<HunterApplicationDTO> getAllApplications() {
-        return hunterApplicationRepository.findAll()
+        return hunterApplicationRepository.findAllByStatus(ApplicationStatus.CREATED)
                 .stream()
                 .map(hunterApplicationMapper::toDTO)
                 .toList();

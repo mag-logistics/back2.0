@@ -68,11 +68,7 @@ public class ExtractorServiceImpl implements ExtractorService {
 
     @Override
     public List<ExtractionApplicationDTO> getAllApplications() {
-        List<ExtractionApplication> list = extractionApplicationRepository.findAll();
-
-        if (list.isEmpty()) {
-            throw new NotFoundException("Заявки не найдены");
-        }
+        List<ExtractionApplication> list = extractionApplicationRepository.findAllByStatus(ApplicationStatus.CREATED);
 
         return list
                 .stream()
