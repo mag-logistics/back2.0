@@ -62,6 +62,8 @@ public class ExtractorServiceImpl implements ExtractorService {
 
     @Autowired
     private ExtractionResponseRepository extractionResponseRepository;
+    @Autowired
+    private AnimalRepository animalRepository;
 
 
     @Override
@@ -100,8 +102,11 @@ public class ExtractorServiceImpl implements ExtractorService {
     @Transactional
     public HunterApplicationDTO createHunterApplication(String email, CreateHunterApplicationRequest request) {
 
-        magicRepository.findById(request.magicId())
+        Magic magic = magicRepository.findById(request.magicId())
                 .orElseThrow(() -> new NotFoundException("Магия " + request.magicId() + " не найдена"));
+
+        Animal animal = animalRepository.findById(request.animalId())
+                .orElseThrow(() -> new NotFoundException("Животное " + request.animalId() + " не найдено"));
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("Пользователь " + email + " не найден"));
@@ -111,6 +116,8 @@ public class ExtractorServiceImpl implements ExtractorService {
 
         HunterApplication hunterApplication = hunterApplicationMapper.toEntity(request);
         hunterApplication.setExtractor(extractor);
+        hunterApplication.setMagic(magic);
+        hunterApplication.setAnimal(animal);
         Date date = new Date();
         hunterApplication.setInitDate(date);
         hunterApplication.setStatus(ApplicationStatus.CREATED);
