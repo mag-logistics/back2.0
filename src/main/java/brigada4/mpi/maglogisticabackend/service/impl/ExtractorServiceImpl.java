@@ -241,6 +241,46 @@ public class ExtractorServiceImpl implements ExtractorService {
         return extractionResponseMapper.toDTO(extractionResponse);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Boolean canCollectMagic(String applicationId) {
+
+        ExtractionApplication app = extractionApplicationRepository.findById(applicationId)
+                .orElseThrow(() -> new NotFoundException(
+                        "Заявка " + applicationId + " не найдена"));
+
+        Magic magic = app.getMagic();
+        int requiredVolume = app.getVolume();
+
+        List<Animal> animals = animalRepository.findByMagicId(magic.getId());
+        List<AnimalStorage> animalStorages = animalStorageRepository.findAll();
+
+        Map<String, AnimalStorage> storageByAnimalId = animalStorages.stream()
+                .collect(Collectors.toMap(
+                        s -> s.getAnimal().getId(),
+                        Function.identity()
+                ));
+
+        int collectedVolume = 0;
+
+        for (Animal animal : animals) {
+            if (collectedVolume >= requiredVolume) {
+                return true;
+            }
+
+            AnimalStorage storage = storageByAnimalId.get(animal.getId());
+            if (storage == null || storage.getQuantity() == 0) {
+                continue;
+            }
+
+            int availableCount = storage.getQuantity();
+            int volumePerAnimal = animal.getMagicVolume();
+
+            collectedVolume += availableCount * volumePerAnimal;
+        }
+
+        return collectedVolume >= requiredVolume;
+    }
 
     @Override
     @Transactional

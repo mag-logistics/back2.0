@@ -65,4 +65,10 @@ public class ExtractorController {
         return extractorService.completeApplication(authentication.getName(), id);
     }
 
+    @GetMapping("/applications/{id}/check")
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean checkCanCollectMagic(@PathVariable String id) {
+        return extractorService.canCollectMagic(id);
+    }
+
 }
