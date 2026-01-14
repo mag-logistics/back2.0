@@ -54,4 +54,11 @@ public class HunterController {
         return hunterService.getMyResponses(authentication.getName());
     }
 
+
+    @PostMapping("/application/{id}/complete")
+    @ResponseStatus(HttpStatus.OK)
+    public HunterResponseDTO completeApplication(Authentication authentication, @PathVariable String id) {
+        return hunterService.completeApplication(authentication.getName(), id);
+    }
+
 }

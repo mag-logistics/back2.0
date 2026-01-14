@@ -2,13 +2,17 @@ package brigada4.mpi.maglogisticabackend.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
 @Entity
 @Table(name = "hunter_response")
+@NoArgsConstructor
+@AllArgsConstructor
 public class HunterResponse extends GenericEntity {
 
 //    @OneToOne(mappedBy = "hunterResponse", cascade = CascadeType.ALL)

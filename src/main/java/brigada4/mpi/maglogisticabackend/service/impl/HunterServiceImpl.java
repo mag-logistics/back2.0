@@ -7,19 +7,15 @@ import brigada4.mpi.maglogisticabackend.exception.ConflictException;
 import brigada4.mpi.maglogisticabackend.exception.NotFoundException;
 import brigada4.mpi.maglogisticabackend.mapper.HunterApplicationMapper;
 import brigada4.mpi.maglogisticabackend.mapper.HunterResponseMapper;
-import brigada4.mpi.maglogisticabackend.models.ApplicationStatus;
-import brigada4.mpi.maglogisticabackend.models.Hunter;
-import brigada4.mpi.maglogisticabackend.models.HunterApplication;
-import brigada4.mpi.maglogisticabackend.models.User;
-import brigada4.mpi.maglogisticabackend.repositories.HunterApplicationRepository;
-import brigada4.mpi.maglogisticabackend.repositories.HunterRepository;
-import brigada4.mpi.maglogisticabackend.repositories.HunterResponseRepository;
-import brigada4.mpi.maglogisticabackend.repositories.UserRepository;
+import brigada4.mpi.maglogisticabackend.models.*;
+import brigada4.mpi.maglogisticabackend.repositories.*;
 import brigada4.mpi.maglogisticabackend.service.HunterService;
+import brigada4.mpi.maglogisticabackend.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -42,6 +38,12 @@ public class HunterServiceImpl implements HunterService {
 
     @Autowired
     private HunterResponseMapper hunterResponseMapper;
+
+    @Autowired
+    private AnimalStorageRepository animalStorageRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
 
     @Override
@@ -106,6 +108,38 @@ public class HunterServiceImpl implements HunterService {
                 .stream()
                 .map(hunterResponseMapper::toDTO)
                 .toList();
+    }
+
+    @Override
+    public HunterResponseDTO completeApplication(String email, String applicationId) {
+
+        HunterApplication app = hunterApplicationRepository.findById(applicationId)
+                .orElseThrow(() -> new NotFoundException("Заявка " + applicationId + " не найдена"));
+
+        Animal animal = app.getAnimal();
+        int requiredQuantity = app.getAnimalCount();
+
+        AnimalStorage animalStorage = animalStorageRepository.findByAnimalId(animal.getId());
+        animalStorage.setQuantity(animalStorage.getQuantity() + requiredQuantity);
+
+        animalStorageRepository.save(animalStorage);
+
+        HunterResponse hunterResponse = new HunterResponse(
+                app.getId(),
+                app.getHunter(),
+                new Date(),
+                requiredQuantity
+        );
+
+        hunterResponseRepository.save(hunterResponse);
+
+        app.setHunterResponse(hunterResponse);
+        app.setStatus(ApplicationStatus.FINISHED);
+        hunterApplicationRepository.save(app);
+
+        notificationService.sendMailAboutFinishingApplication(app.getExtractor(), app.getHunter());
+
+        return hunterResponseMapper.toDTO(hunterResponse);
     }
 
 }
