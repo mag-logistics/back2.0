@@ -5,6 +5,6 @@ import java.util.Date;
 public record CreateHunterApplicationRequest(
         String magicId,
         String animalId,
-        int volume,
+        int quantity,
         Date deadline
 ) {}
