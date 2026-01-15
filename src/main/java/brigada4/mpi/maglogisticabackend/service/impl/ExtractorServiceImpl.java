@@ -298,16 +298,23 @@ public class ExtractorServiceImpl implements ExtractorService {
     @Transactional
     public ByteArrayInputStream generateReportOne(String userId, String applicationId) {
         Extractor extractor = extractorRepository.findById(userId).orElse(null);
-        HunterApplication hunterApplication = hunterApplicationRepository.findById(applicationId).orElse(null);
-        if (extractor == null || hunterApplication == null) {
+        ExtractionApplication extractionApplication = extractionApplicationRepository.findById(applicationId).orElse(null);
+        if (extractor == null || extractionApplication == null) {
             return null;
         }
-        Magic magic = magicRepository.findById(hunterApplication.getMagic().getId()).orElse(null);
+        Magic magic = magicRepository.findById(extractionApplication.getMagic().getId()).orElse(null);
         if (magic == null) {
             return null;
         }
-        Hunter hunter = hunterRepository.findById(hunterApplication.getHunter().getId()).orElse(null);
-
+        Storekeeper storekeeper = extractionApplication.getStorekeeper();
+        HunterApplication hunterApplication = new HunterApplication();
+        Hunter hunter = new Hunter();
+        if (extractionApplication != null && extractionApplication.getHunterApp() != null) {
+            hunterApplication = hunterApplicationRepository.findById(extractionApplication.getHunterApp().getId()).orElse(null);
+        }
+        if (hunterApplication != null && hunterApplication.getHunter() != null) {
+            hunter = hunterRepository.findById(hunterApplication.getHunter().getId()).orElse(null);
+        }
         // Создаем поток для записи PDF в память
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -323,7 +330,7 @@ public class ExtractorServiceImpl implements ExtractorService {
             document.setFont(font);
 
             // 3. Добавляем заголовок
-            Paragraph title = new Paragraph("Report by hunter application with id:\n" + applicationId)
+            Paragraph title = new Paragraph("Report by extraction application with id:\n" + applicationId)
                     .setFontSize(16)
                     .setBold()
                     .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER);
@@ -333,7 +340,7 @@ public class ExtractorServiceImpl implements ExtractorService {
 
             // 4. Добавляем информацию
             document.add(new Paragraph("Applicant's full name : " + extractor.getSurname() + " " + extractor.getName() + " " + extractor.getPatronymic()).setFontSize(14));
-            document.add(new Paragraph("Application type: Hunter application").setFontSize(14));
+            document.add(new Paragraph("Application type: Extraction application").setFontSize(14));
             document.add(new Paragraph("Magic:" + magic.getMagicColour().getName() + ", " + magic.getMagicPower().getName() + ", " + magic.getMagicType().getName() + ", " + magic.getMagicState().getName()).setFontSize(14));
             document.add(new Paragraph("Application status: " + hunterApplication.getStatus()).setFontSize(14));
 
@@ -354,12 +361,18 @@ public class ExtractorServiceImpl implements ExtractorService {
 
             // Данные таблицы
             if (hunter != null && hunter.getId() != null && extractor != null && extractor.getId() != null) {
+                table.addCell(new Cell().add(new Paragraph("Storekeeper")));
+                table.addCell(new Cell().add(new Paragraph(storekeeper.getSurname() + " " + storekeeper.getName() + " " + storekeeper.getPatronymic())));
+
                 table.addCell(new Cell().add(new Paragraph("Extractor")));
                 table.addCell(new Cell().add(new Paragraph(extractor.getSurname() + " " + extractor.getName() + " " + extractor.getPatronymic())));
 
                 table.addCell(new Cell().add(new Paragraph("Hunter")));
                 table.addCell(new Cell().add(new Paragraph(hunter.getSurname() + " " + hunter.getName() + " " + hunter.getPatronymic())));
             } else if (extractor != null && extractor.getId() != null) {
+                table.addCell(new Cell().add(new Paragraph("Storekeeper")));
+                table.addCell(new Cell().add(new Paragraph(storekeeper.getSurname() + " " + storekeeper.getName() + " " + storekeeper.getPatronymic())));
+
                 table.addCell(new Cell().add(new Paragraph("Extractor")));
                 table.addCell(new Cell().add(new Paragraph(extractor.getSurname() + " " + extractor.getName() + " " + extractor.getPatronymic())));
             } else {
@@ -402,16 +415,23 @@ public class ExtractorServiceImpl implements ExtractorService {
     @Override
     public ByteArrayInputStream generateReportTwo(String userId, String applicationId) {
         Extractor extractor = extractorRepository.findById(userId).orElse(null);
-        HunterApplication hunterApplication = hunterApplicationRepository.findById(applicationId).orElse(null);
-        if (extractor == null || hunterApplication == null) {
+        ExtractionApplication extractionApplication = extractionApplicationRepository.findById(applicationId).orElse(null);
+        if (extractor == null || extractionApplication == null) {
             return null;
         }
-        Magic magic = magicRepository.findById(hunterApplication.getMagic().getId()).orElse(null);
+        Magic magic = magicRepository.findById(extractionApplication.getMagic().getId()).orElse(null);
         if (magic == null) {
             return null;
         }
-        Hunter hunter = hunterRepository.findById(hunterApplication.getHunter().getId()).orElse(null);
-
+        Storekeeper storekeeper = extractionApplication.getStorekeeper();
+        HunterApplication hunterApplication = new HunterApplication();
+        Hunter hunter = new Hunter();
+        if (extractionApplication != null && extractionApplication.getHunterApp() != null) {
+            hunterApplication = hunterApplicationRepository.findById(extractionApplication.getHunterApp().getId()).orElse(null);
+        }
+        if (hunterApplication != null && hunterApplication.getHunter() != null) {
+            hunter = hunterRepository.findById(hunterApplication.getHunter().getId()).orElse(null);
+        }
         // Создаем поток для записи PDF в память
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -445,7 +465,7 @@ public class ExtractorServiceImpl implements ExtractorService {
             }
 
             // 3. Добавляем заголовок
-            Paragraph title = new Paragraph("Report by hunter application with id:\n" + applicationId)
+            Paragraph title = new Paragraph("Report by extraction application with id:\n" + applicationId)
                     .setFontSize(16)
                     .setBold()
                     .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER);
@@ -455,7 +475,7 @@ public class ExtractorServiceImpl implements ExtractorService {
 
             // 4. Добавляем информацию
             document.add(new Paragraph("Applicant's full name : " + extractor.getSurname() + " " + extractor.getName() + " " + extractor.getPatronymic()).setFontSize(14));
-            document.add(new Paragraph("Application type: Hunter application").setFontSize(14));
+            document.add(new Paragraph("Application type: Extraction application").setFontSize(14));
             document.add(new Paragraph("Magic:" + magic.getMagicColour().getName() + ", " + magic.getMagicPower().getName() + ", " + magic.getMagicType().getName() + ", " + magic.getMagicState().getName()).setFontSize(14));
             document.add(new Paragraph("Application status: " + hunterApplication.getStatus()).setFontSize(14));
 
@@ -476,12 +496,18 @@ public class ExtractorServiceImpl implements ExtractorService {
 
             // Данные таблицы
             if (hunter != null && hunter.getId() != null && extractor != null && extractor.getId() != null) {
+                table.addCell(new Cell().add(new Paragraph("Storekeeper")));
+                table.addCell(new Cell().add(new Paragraph(storekeeper.getSurname() + " " + storekeeper.getName() + " " + storekeeper.getPatronymic())));
+
                 table.addCell(new Cell().add(new Paragraph("Extractor")));
                 table.addCell(new Cell().add(new Paragraph(extractor.getSurname() + " " + extractor.getName() + " " + extractor.getPatronymic())));
 
                 table.addCell(new Cell().add(new Paragraph("Hunter")));
                 table.addCell(new Cell().add(new Paragraph(hunter.getSurname() + " " + hunter.getName() + " " + hunter.getPatronymic())));
             } else if (extractor != null && extractor.getId() != null) {
+                table.addCell(new Cell().add(new Paragraph("Storekeeper")));
+                table.addCell(new Cell().add(new Paragraph(storekeeper.getSurname() + " " + storekeeper.getName() + " " + storekeeper.getPatronymic())));
+
                 table.addCell(new Cell().add(new Paragraph("Extractor")));
                 table.addCell(new Cell().add(new Paragraph(extractor.getSurname() + " " + extractor.getName() + " " + extractor.getPatronymic())));
             } else {
