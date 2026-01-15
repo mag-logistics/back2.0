@@ -129,6 +129,7 @@ public class ExtractorServiceImpl implements ExtractorService {
         hunterApplication.setAnimal(animal);
         Date date = new Date();
         hunterApplication.setInitDate(date);
+        hunterApplication.setAnimalCount(request.quantity());
         hunterApplication.setStatus(ApplicationStatus.CREATED);
 
         hunterApplicationRepository.save(hunterApplication);

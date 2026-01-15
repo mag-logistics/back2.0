@@ -21,4 +21,6 @@ public interface HunterService {
     HunterApplicationDTO takeApplication(String email, String id);
 
     List<HunterResponseDTO> getMyResponses(String email);
+
+    HunterResponseDTO completeApplication(String email, String applicationId);
 }
