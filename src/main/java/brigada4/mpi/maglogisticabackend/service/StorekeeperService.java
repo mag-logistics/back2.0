@@ -1,30 +1,20 @@
 package brigada4.mpi.maglogisticabackend.service;
 
 import brigada4.mpi.maglogisticabackend.dto.ExtractionApplicationDTO;
-import brigada4.mpi.maglogisticabackend.dto.MagicApplicationDTO;
 import brigada4.mpi.maglogisticabackend.dto.MagicResponseDTO;
 import brigada4.mpi.maglogisticabackend.mapper.ExtractionApplicationMapper;
-import brigada4.mpi.maglogisticabackend.mapper.MagicMapper;
 import brigada4.mpi.maglogisticabackend.models.*;
 import brigada4.mpi.maglogisticabackend.repositories.*;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
-import com.itextpdf.kernel.events.Event;
-import com.itextpdf.kernel.events.IEventHandler;
 import com.itextpdf.kernel.events.PdfDocumentEvent;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
-import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
-import com.itextpdf.kernel.pdf.extgstate.PdfExtGState;
-import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Cell;
-import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.UnitValue;
@@ -35,19 +25,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Service
 public class StorekeeperService {
 
-    private final MagicianRepository magicianRepository;
     private final MagicRepository magicRepository;
     private final ExtractorRepository extractorRepository;
     private final HunterRepository hunterRepository;
@@ -59,8 +42,7 @@ public class StorekeeperService {
     private final MagicStorageRepository magicStorageRepository;
     private final NotificationService notificationService;
 
-    public StorekeeperService(MagicianRepository magicianRepository, MagicRepository magicRepository, ExtractorRepository extractorRepository, HunterRepository hunterRepository, StorekeeperRepository storekeeperRepository, MagicApplicationRepository magicApplicationRepository, MagicResponseRepository magicResponseRepository, ExtractionApplicationMapper extractionApplicationMapper, ExtractionApplicationRepository extractionApplicationRepository, MagicStorageRepository magicStorageRepository, NotificationService notificationService) {
-        this.magicianRepository = magicianRepository;
+    public StorekeeperService(MagicRepository magicRepository, ExtractorRepository extractorRepository, HunterRepository hunterRepository, StorekeeperRepository storekeeperRepository, MagicApplicationRepository magicApplicationRepository, MagicResponseRepository magicResponseRepository, ExtractionApplicationMapper extractionApplicationMapper, ExtractionApplicationRepository extractionApplicationRepository, MagicStorageRepository magicStorageRepository, NotificationService notificationService) {
         this.magicRepository = magicRepository;
         this.extractorRepository = extractorRepository;
         this.hunterRepository = hunterRepository;
@@ -179,7 +161,9 @@ public class StorekeeperService {
         }
         magicApplication.setStorekeeper(storekeeper);
         magicApplication.setStatus(ApplicationStatus.WORKED);
-        notificationService.sendMailAboutWorkingApplication(magicApplication.getMagician(), storekeeper);
+        if (magicApplication.getMagician().getEmail() != null) {
+            notificationService.sendMailAboutWorkingApplication(magicApplication.getMagician(), storekeeper);
+        }
         return magicApplicationRepository.save(magicApplication);
     }
 

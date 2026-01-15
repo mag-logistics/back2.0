@@ -2,7 +2,6 @@ package brigada4.mpi.maglogisticabackend.service.impl;
 
 import brigada4.mpi.maglogisticabackend.dto.HunterApplicationDTO;
 import brigada4.mpi.maglogisticabackend.dto.HunterResponseDTO;
-import brigada4.mpi.maglogisticabackend.dto.StatusDTO;
 import brigada4.mpi.maglogisticabackend.exception.ConflictException;
 import brigada4.mpi.maglogisticabackend.exception.NotFoundException;
 import brigada4.mpi.maglogisticabackend.mapper.HunterApplicationMapper;
@@ -15,21 +14,13 @@ import brigada4.mpi.maglogisticabackend.service.NotificationService;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
-import com.itextpdf.kernel.events.Event;
-import com.itextpdf.kernel.events.IEventHandler;
 import com.itextpdf.kernel.events.PdfDocumentEvent;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
-import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
-import com.itextpdf.kernel.pdf.extgstate.PdfExtGState;
-import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Cell;
-import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.UnitValue;
@@ -123,6 +114,10 @@ public class HunterServiceImpl implements HunterService {
 
         hunterApplicationRepository.save(app);
 
+        if (app.getExtractor().getEmail() != null) {
+            notificationService.sendMailAboutWorkingApplication(app.getExtractor(), hunter);
+        }
+
         return hunterApplicationMapper.toDTO(app);
     }
 
@@ -183,8 +178,10 @@ public class HunterServiceImpl implements HunterService {
         if (magic == null) {
             return null;
         }
-        Extractor extractor = new Extractor();
-        extractor = extractorRepository.findById(hunterApplication.getExtractor().getId()).orElse(null);
+        Extractor extractor = extractorRepository.findById(hunterApplication.getExtractor().getId()).orElse(null);
+        if (extractor.getId() == null) {
+            return null;
+        }
 
         // Создаем поток для записи PDF в память
         ByteArrayOutputStream out = new ByteArrayOutputStream();
