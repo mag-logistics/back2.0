@@ -41,8 +41,9 @@ public class StorekeeperService {
     private final ExtractionApplicationRepository extractionApplicationRepository;
     private final MagicStorageRepository magicStorageRepository;
     private final NotificationService notificationService;
+    private final MagicianRepository magicianRepository;
 
-    public StorekeeperService(MagicRepository magicRepository, ExtractorRepository extractorRepository, HunterRepository hunterRepository, StorekeeperRepository storekeeperRepository, MagicApplicationRepository magicApplicationRepository, MagicResponseRepository magicResponseRepository, ExtractionApplicationMapper extractionApplicationMapper, ExtractionApplicationRepository extractionApplicationRepository, MagicStorageRepository magicStorageRepository, NotificationService notificationService) {
+    public StorekeeperService(MagicRepository magicRepository, ExtractorRepository extractorRepository, HunterRepository hunterRepository, StorekeeperRepository storekeeperRepository, MagicApplicationRepository magicApplicationRepository, MagicResponseRepository magicResponseRepository, ExtractionApplicationMapper extractionApplicationMapper, ExtractionApplicationRepository extractionApplicationRepository, MagicStorageRepository magicStorageRepository, NotificationService notificationService, MagicianRepository magicianRepository) {
         this.magicRepository = magicRepository;
         this.extractorRepository = extractorRepository;
         this.hunterRepository = hunterRepository;
@@ -53,6 +54,7 @@ public class StorekeeperService {
         this.extractionApplicationRepository = extractionApplicationRepository;
         this.magicStorageRepository = magicStorageRepository;
         this.notificationService = notificationService;
+        this.magicianRepository = magicianRepository;
     }
 
     public List<MagicApplication> getAllMagicApplication() {
@@ -168,11 +170,15 @@ public class StorekeeperService {
     }
 
     public ByteArrayInputStream generateReportOne(String userId, String applicationId) {
-        ExtractionApplication extractionApplication = extractionApplicationRepository.findById(applicationId).orElse(null);
-        if (extractionApplication == null) {
+        MagicApplication magicApplication = magicApplicationRepository.findById(applicationId).orElse(null);
+        if (magicApplication == null) {
             return null;
         }
-        Magic magic = magicRepository.findById(extractionApplication.getMagic().getId()).orElse(null);
+        Magician magician = magicianRepository.findById(magicApplication.getMagician().getId()).orElse(null);
+        if (magician == null) {
+            return null;
+        }
+        Magic magic = magicRepository.findById(magicApplication.getMagic().getId()).orElse(null);
         if (magic == null) {
             return null;
         }
@@ -180,18 +186,6 @@ public class StorekeeperService {
         if (storekeeper == null) {
             return null;
         }
-        Hunter hunter = new Hunter();
-        Extractor extractor = new Extractor();
-        if (extractionApplication.getExtractor() != null) {
-            extractor = extractorRepository.findById(extractionApplication.getExtractor().getId()).orElse(null);
-        }
-        HunterApplication hunterApplication = new HunterApplication();
-        if (extractionApplication.getHunterApp() != null) {
-            hunterApplication = extractionApplication.getHunterApp();
-            hunter = hunterRepository.findById(hunterApplication.getHunter().getId()).orElse(null);
-        }
-
-
         // Создаем поток для записи PDF в память
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -207,7 +201,7 @@ public class StorekeeperService {
             document.setFont(font);
 
             // 3. Добавляем заголовок
-            Paragraph title = new Paragraph("Report by extraction application with id:\n" + applicationId)
+            Paragraph title = new Paragraph("Report by magic application with id:\n" + applicationId)
                     .setFontSize(16)
                     .setBold()
                     .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER);
@@ -217,9 +211,9 @@ public class StorekeeperService {
 
             // 4. Добавляем информацию
             document.add(new Paragraph("Applicant's full name : " + storekeeper.getSurname() + " " + storekeeper.getName() + " " + storekeeper.getPatronymic()).setFontSize(14));
-            document.add(new Paragraph("Application type: Extraction application").setFontSize(14));
+            document.add(new Paragraph("Application type: Magic application").setFontSize(14));
             document.add(new Paragraph("Magic:" + magic.getMagicColour().getName() + ", " + magic.getMagicPower().getName() + ", " + magic.getMagicType().getName() + ", " + magic.getMagicState().getName()).setFontSize(14));
-            document.add(new Paragraph("Application status: " + extractionApplication.getStatus()).setFontSize(14));
+            document.add(new Paragraph("Application status: " + magicApplication.getStatus()).setFontSize(14));
 
             document.add(new Paragraph("\n")); // пустая строка
             Paragraph subTitle1 = new Paragraph("Application lifecycle\n")
@@ -237,22 +231,9 @@ public class StorekeeperService {
             table.addHeaderCell(new Cell().add(new Paragraph("Employee's full name").setBold()));
 
             // Данные таблицы
-            if (hunter != null && hunter.getId() != null && extractor != null && extractor.getId() != null) {
-                table.addCell(new Cell().add(new Paragraph("Storekeeper")));
-                table.addCell(new Cell().add(new Paragraph(storekeeper.getSurname() + " " + storekeeper.getName() + " " + storekeeper.getPatronymic())));
-
-                table.addCell(new Cell().add(new Paragraph("Extractor")));
-                table.addCell(new Cell().add(new Paragraph(extractor.getSurname() + " " + extractor.getName() + " " + extractor.getPatronymic())));
-
-                table.addCell(new Cell().add(new Paragraph("Hunter")));
-                table.addCell(new Cell().add(new Paragraph(hunter.getSurname() + " " + hunter.getName() + " " + hunter.getPatronymic())));
-            } else if (extractor != null && extractor.getId() != null) {
-                table.addCell(new Cell().add(new Paragraph("Storekeeper")));
-                table.addCell(new Cell().add(new Paragraph(storekeeper.getSurname() + " " + storekeeper.getName() + " " + storekeeper.getPatronymic())));
-
-                table.addCell(new Cell().add(new Paragraph("Extractor")));
-                table.addCell(new Cell().add(new Paragraph(extractor.getSurname() + " " + extractor.getName() + " " + extractor.getPatronymic())));
-            } else if (storekeeper != null && storekeeper.getId() != null) {
+            if (storekeeper != null && storekeeper.getId() != null) {
+                table.addCell(new Cell().add(new Paragraph("Magician")));
+                table.addCell(new Cell().add(new Paragraph(magician.getSurname() + " " + magician.getName() + " " + magician.getPatronymic())));
                 table.addCell(new Cell().add(new Paragraph("Storekeeper")));
                 table.addCell(new Cell().add(new Paragraph(storekeeper.getSurname() + " " + storekeeper.getName() + " " + storekeeper.getPatronymic())));
             } else {
@@ -293,11 +274,15 @@ public class StorekeeperService {
     }
 
     public ByteArrayInputStream generateReportTwo(String userId, String applicationId) {
-        ExtractionApplication extractionApplication = extractionApplicationRepository.findById(applicationId).orElse(null);
-        if (extractionApplication == null) {
+        MagicApplication magicApplication = magicApplicationRepository.findById(applicationId).orElse(null);
+        if (magicApplication == null) {
             return null;
         }
-        Magic magic = magicRepository.findById(extractionApplication.getMagic().getId()).orElse(null);
+        Magician magician = magicianRepository.findById(magicApplication.getMagician().getId()).orElse(null);
+        if (magician == null) {
+            return null;
+        }
+        Magic magic = magicRepository.findById(magicApplication.getMagic().getId()).orElse(null);
         if (magic == null) {
             return null;
         }
@@ -305,17 +290,6 @@ public class StorekeeperService {
         if (storekeeper == null) {
             return null;
         }
-        Hunter hunter = new Hunter();
-        Extractor extractor = new Extractor();
-        if (extractionApplication.getExtractor() != null) {
-            extractor = extractorRepository.findById(extractionApplication.getExtractor().getId()).orElse(null);
-        }
-        HunterApplication hunterApplication = new HunterApplication();
-        if (extractionApplication.getHunterApp() != null) {
-            hunterApplication = extractionApplication.getHunterApp();
-            hunter = hunterRepository.findById(hunterApplication.getHunter().getId()).orElse(null);
-        }
-
 
         // Создаем поток для записи PDF в память
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -350,7 +324,7 @@ public class StorekeeperService {
             }
 
             // 3. Добавляем заголовок
-            Paragraph title = new Paragraph("Report by extraction application with id:\n" + applicationId)
+            Paragraph title = new Paragraph("Report by magic application with id:\n" + applicationId)
                     .setFontSize(16)
                     .setBold()
                     .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER);
@@ -360,9 +334,9 @@ public class StorekeeperService {
 
             // 4. Добавляем информацию
             document.add(new Paragraph("Applicant's full name : " + storekeeper.getSurname() + " " + storekeeper.getName() + " " + storekeeper.getPatronymic()).setFontSize(14));
-            document.add(new Paragraph("Application type: Extraction application").setFontSize(14));
+            document.add(new Paragraph("Application type: Magic application").setFontSize(14));
             document.add(new Paragraph("Magic:" + magic.getMagicColour().getName() + ", " + magic.getMagicPower().getName() + ", " + magic.getMagicType().getName() + ", " + magic.getMagicState().getName()).setFontSize(14));
-            document.add(new Paragraph("Application status: " + extractionApplication.getStatus()).setFontSize(14));
+            document.add(new Paragraph("Application status: " + magicApplication.getStatus()).setFontSize(14));
 
             document.add(new Paragraph("\n")); // пустая строка
             Paragraph subTitle1 = new Paragraph("Application lifecycle\n")
@@ -380,22 +354,9 @@ public class StorekeeperService {
             table.addHeaderCell(new Cell().add(new Paragraph("Employee's full name").setBold()));
 
             // Данные таблицы
-            if (hunter != null && hunter.getId() != null && extractor != null && extractor.getId() != null) {
-                table.addCell(new Cell().add(new Paragraph("Storekeeper")));
-                table.addCell(new Cell().add(new Paragraph(storekeeper.getSurname() + " " + storekeeper.getName() + " " + storekeeper.getPatronymic())));
-
-                table.addCell(new Cell().add(new Paragraph("Extractor")));
-                table.addCell(new Cell().add(new Paragraph(extractor.getSurname() + " " + extractor.getName() + " " + extractor.getPatronymic())));
-
-                table.addCell(new Cell().add(new Paragraph("Hunter")));
-                table.addCell(new Cell().add(new Paragraph(hunter.getSurname() + " " + hunter.getName() + " " + hunter.getPatronymic())));
-            } else if (extractor != null && extractor.getId() != null) {
-                table.addCell(new Cell().add(new Paragraph("Storekeeper")));
-                table.addCell(new Cell().add(new Paragraph(storekeeper.getSurname() + " " + storekeeper.getName() + " " + storekeeper.getPatronymic())));
-
-                table.addCell(new Cell().add(new Paragraph("Extractor")));
-                table.addCell(new Cell().add(new Paragraph(extractor.getSurname() + " " + extractor.getName() + " " + extractor.getPatronymic())));
-            } else if (storekeeper != null && storekeeper.getId() != null) {
+            if (storekeeper != null && storekeeper.getId() != null) {
+                table.addCell(new Cell().add(new Paragraph("Magician")));
+                table.addCell(new Cell().add(new Paragraph(magician.getSurname() + " " + magician.getName() + " " + magician.getPatronymic())));
                 table.addCell(new Cell().add(new Paragraph("Storekeeper")));
                 table.addCell(new Cell().add(new Paragraph(storekeeper.getSurname() + " " + storekeeper.getName() + " " + storekeeper.getPatronymic())));
             } else {
