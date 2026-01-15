@@ -23,7 +23,12 @@ public interface ExtractorService {
 
     List<ExtractionResponseDTO> getMyResponses(String email);
 
+    ExtractionResponseDTO completeApplication(String name, String application_id);
+
+    Boolean canCollectMagic(String applicationId);
+
     ByteArrayInputStream generateReportOne(String userId, String applicationId);
 
+    ByteArrayInputStream generateReportTwo(String userId, String applicationId);
 }
 

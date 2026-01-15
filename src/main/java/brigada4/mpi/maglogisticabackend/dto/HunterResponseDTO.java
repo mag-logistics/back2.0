@@ -16,7 +16,7 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class HunterResponseDTO {
     private String id;
-    private HunterApplicationDTO hunterApp;
+    private String hunterAppId;
     private HunterDTO hunter;
     private Date date;
     private int volume;

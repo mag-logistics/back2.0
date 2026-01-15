@@ -29,7 +29,7 @@ public class ExtractorController {
         return extractorService.getAllApplications();
     }
 
-    @GetMapping("/my-application")
+    @GetMapping("/my-applications")
     @ResponseStatus(HttpStatus.OK)
     public List<ExtractionApplicationDTO> getMyApplications(Authentication authentication) {
         return extractorService.getMyApplications(authentication.getName());
@@ -57,6 +57,18 @@ public class ExtractorController {
     @ResponseStatus(HttpStatus.OK)
     public List<ExtractionResponseDTO> getMyResponses(Authentication authentication) {
         return extractorService.getMyResponses(authentication.getName());
+    }
+
+    @PostMapping("/applications/{id}/complete")
+    @ResponseStatus(HttpStatus.OK)
+    public ExtractionResponseDTO completeApplication(Authentication authentication, @PathVariable String id) {
+        return extractorService.completeApplication(authentication.getName(), id);
+    }
+
+    @GetMapping("/applications/{id}/check")
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean checkCanCollectMagic(@PathVariable String id) {
+        return extractorService.canCollectMagic(id);
     }
 
 }

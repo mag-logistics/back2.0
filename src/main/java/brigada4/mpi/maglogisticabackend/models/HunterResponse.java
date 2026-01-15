@@ -2,18 +2,24 @@ package brigada4.mpi.maglogisticabackend.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
 @Entity
 @Table(name = "hunter_response")
-public class HunterResponse extends GenericEntity{
+@NoArgsConstructor
+@AllArgsConstructor
+public class HunterResponse extends GenericEntity {
 
-    @OneToOne(mappedBy = "hunterResponse", cascade = CascadeType.ALL)
-    @JoinColumn(name = "hunter_application_id")
-    private HunterApplication hunterApp;
+//    @OneToOne(mappedBy = "hunterResponse", cascade = CascadeType.ALL)
+//    @JoinColumn(name = "hunter_application_id")
+//    private HunterApplication hunterApp;
+    @Column(name = "hunter_application_id")
+    private String hunterAppId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "hunter_id", referencedColumnName = "id")

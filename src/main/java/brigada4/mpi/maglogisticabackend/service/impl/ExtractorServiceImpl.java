@@ -12,13 +12,26 @@ import brigada4.mpi.maglogisticabackend.models.*;
 import brigada4.mpi.maglogisticabackend.payload.request.CreateHunterApplicationRequest;
 import brigada4.mpi.maglogisticabackend.repositories.*;
 import brigada4.mpi.maglogisticabackend.service.ExtractorService;
+import brigada4.mpi.maglogisticabackend.service.MagicianService;
+import brigada4.mpi.maglogisticabackend.service.NotificationService;
 import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.events.Event;
+import com.itextpdf.kernel.events.IEventHandler;
+import com.itextpdf.kernel.events.PdfDocumentEvent;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
+import com.itextpdf.kernel.pdf.extgstate.PdfExtGState;
+import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.UnitValue;
@@ -30,8 +43,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
+import java.io.InputStream;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class ExtractorServiceImpl implements ExtractorService {
@@ -62,17 +77,26 @@ public class ExtractorServiceImpl implements ExtractorService {
 
     @Autowired
     private ExtractionResponseRepository extractionResponseRepository;
+
     @Autowired
     private AnimalRepository animalRepository;
+
+    @Autowired
+    private MagicStorageRepository magicStorageRepository;
+
+    @Autowired
+    private AnimalStorageRepository animalStorageRepository;
+
+    @Autowired
+    private NotificationService  notificationService;
+
+    @Autowired
+    private HunterRepository hunterRepository;
 
 
     @Override
     public List<ExtractionApplicationDTO> getAllApplications() {
-        List<ExtractionApplication> list = extractionApplicationRepository.findAll();
-
-        if (list.isEmpty()) {
-            throw new NotFoundException("Заявки не найдены");
-        }
+        List<ExtractionApplication> list = extractionApplicationRepository.findAllByStatus(ApplicationStatus.CREATED);
 
         return list
                 .stream()
@@ -83,7 +107,7 @@ public class ExtractorServiceImpl implements ExtractorService {
     @Override
     public List<ExtractionApplicationDTO> getMyApplications(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("Кладовщик " + email +" не найден"));
+                .orElseThrow(() -> new NotFoundException("Пользователь " + email +" не найден"));
 
         return extractionApplicationRepository.findAllByExtractorId(user.getId())
                 .stream()
@@ -101,9 +125,6 @@ public class ExtractorServiceImpl implements ExtractorService {
     @Override
     @Transactional
     public HunterApplicationDTO createHunterApplication(String email, String extrAppId, CreateHunterApplicationRequest request) {
-
-        ExtractionApplication extractionApplication = extractionApplicationRepository.findById(extrAppId)
-                .orElseThrow(() -> new NotFoundException("ExtractionApp " + extrAppId + " не найдена"));
 
         Magic magic = magicRepository.findById(request.magicId())
                 .orElseThrow(() -> new NotFoundException("Магия " + request.magicId() + " не найдена"));
@@ -124,6 +145,7 @@ public class ExtractorServiceImpl implements ExtractorService {
         hunterApplication.setAnimal(animal);
         Date date = new Date();
         hunterApplication.setInitDate(date);
+        hunterApplication.setAnimalCount(request.quantity());
         hunterApplication.setStatus(ApplicationStatus.CREATED);
 
         hunterApplicationRepository.save(hunterApplication);
@@ -170,10 +192,127 @@ public class ExtractorServiceImpl implements ExtractorService {
                 .toList();
     }
 
+    @Override
+    @Transactional
+    public ExtractionResponseDTO completeApplication(String name, String applicationId) {
+
+        ExtractionApplication app = extractionApplicationRepository.findById(applicationId)
+                .orElseThrow(() -> new NotFoundException("Заявка " + applicationId + " не найдена"));
+
+        Magic magic = app.getMagic();
+        int requiredVolume = app.getVolume();
+
+        MagicStorage magicStorage = magicStorageRepository.findByMagicId(magic.getId())
+                .orElseThrow(() -> new NotFoundException(
+                        "Хранилище для магии " + magic.getId() + " не найдено"));
+
+        List<Animal> animals = animalRepository.findByMagicId(magic.getId());
+        List<AnimalStorage> animalStorages = animalStorageRepository.findAll();
+
+        Map<String, AnimalStorage> storageByAnimalId = animalStorages.stream()
+                .collect(Collectors.toMap(
+                        s -> s.getAnimal().getId(),
+                        Function.identity()
+                ));
+
+        List<Animal> animalsInStorage = animals.stream()
+                .filter(a -> storageByAnimalId.containsKey(a.getId()))
+                .toList();
+
+        int collectedVolume = 0;
+
+        for (Animal animal : animalsInStorage) {
+            if (collectedVolume >= requiredVolume) break;
+
+            AnimalStorage storage = storageByAnimalId.get(animal.getId());
+            int availableCount = storage.getQuantity();
+            int volumePerAnimal = animal.getMagicVolume();
+
+            while (availableCount > 0 && collectedVolume < requiredVolume) {
+                collectedVolume += volumePerAnimal;
+                availableCount--;
+            }
+
+            storage.setQuantity(availableCount);
+            animalStorageRepository.save(storage);
+        }
+
+        magicStorage.setVolume(magicStorage.getVolume() + requiredVolume);
+        magicStorageRepository.save(magicStorage);
+
+        ExtractionResponse extractionResponse = new ExtractionResponse(
+                app.getId(),
+                app.getExtractor(),
+                new Date()
+        );
+
+        extractionResponseRepository.save(extractionResponse);
+
+        app.setExtractionResponse(extractionResponse);
+        app.setStatus(ApplicationStatus.FINISHED);
+
+        extractionApplicationRepository.save(app);
+
+        notificationService.sendMailAboutFinishingApplication(app.getStorekeeper(), app.getExtractor());
+
+        return extractionResponseMapper.toDTO(extractionResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Boolean canCollectMagic(String applicationId) {
+
+        ExtractionApplication app = extractionApplicationRepository.findById(applicationId)
+                .orElseThrow(() -> new NotFoundException(
+                        "Заявка " + applicationId + " не найдена"));
+
+        Magic magic = app.getMagic();
+        int requiredVolume = app.getVolume();
+
+        List<Animal> animals = animalRepository.findByMagicId(magic.getId());
+        List<AnimalStorage> animalStorages = animalStorageRepository.findAll();
+
+        Map<String, AnimalStorage> storageByAnimalId = animalStorages.stream()
+                .collect(Collectors.toMap(
+                        s -> s.getAnimal().getId(),
+                        Function.identity()
+                ));
+
+        int collectedVolume = 0;
+
+        for (Animal animal : animals) {
+            if (collectedVolume >= requiredVolume) {
+                return true;
+            }
+
+            AnimalStorage storage = storageByAnimalId.get(animal.getId());
+            if (storage == null || storage.getQuantity() == 0) {
+                continue;
+            }
+
+            int availableCount = storage.getQuantity();
+            int volumePerAnimal = animal.getMagicVolume();
+
+            collectedVolume += availableCount * volumePerAnimal;
+        }
+
+        return collectedVolume >= requiredVolume;
+    }
 
     @Override
     @Transactional
     public ByteArrayInputStream generateReportOne(String userId, String applicationId) {
+        Extractor extractor = extractorRepository.findById(userId).orElse(null);
+        HunterApplication hunterApplication = hunterApplicationRepository.findById(applicationId).orElse(null);
+        if (extractor == null || hunterApplication == null) {
+            return null;
+        }
+        Magic magic = magicRepository.findById(hunterApplication.getMagic().getId()).orElse(null);
+        if (magic == null) {
+            return null;
+        }
+        Hunter hunter = hunterRepository.findById(hunterApplication.getHunter().getId()).orElse(null);
+
         // Создаем поток для записи PDF в память
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -184,12 +323,12 @@ public class ExtractorServiceImpl implements ExtractorService {
             Document document = new Document(pdfDoc);
 
             // 2. Загружаем шрифт с поддержкой кириллицы
-            PdfFont font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+            PdfFont font = PdfFontFactory.createFont(StandardFonts.TIMES_ROMAN);
 
             document.setFont(font);
 
             // 3. Добавляем заголовок
-            Paragraph title = new Paragraph("ОТЧЕТ ПО ЗАЯВКЕ")
+            Paragraph title = new Paragraph("Report by hunter application with id:\n" + applicationId)
                     .setFontSize(16)
                     .setBold()
                     .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER);
@@ -198,40 +337,61 @@ public class ExtractorServiceImpl implements ExtractorService {
             document.add(new Paragraph("\n")); // пустая строка
 
             // 4. Добавляем информацию
-            document.add(new Paragraph("ID пользователя: " + userId));
-            document.add(new Paragraph("ID заявки: " + applicationId));
-            document.add(new Paragraph("Дата генерации: " + java.time.LocalDate.now()));
+            document.add(new Paragraph("Applicant's full name : " + extractor.getSurname() + " " + extractor.getName() + " " + extractor.getPatronymic()).setFontSize(14));
+            document.add(new Paragraph("Application type: Hunter application").setFontSize(14));
+            document.add(new Paragraph("Magic:" + magic.getMagicColour().getName() + ", " + magic.getMagicPower().getName() + ", " + magic.getMagicType().getName() + ", " + magic.getMagicState().getName()).setFontSize(14));
+            document.add(new Paragraph("Application status: " + hunterApplication.getStatus()).setFontSize(14));
 
             document.add(new Paragraph("\n")); // пустая строка
+            Paragraph subTitle1 = new Paragraph("Application lifecycle\n")
+                    .setFontSize(14)
+                    .setBold()
+                    .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER);
+            document.add(subTitle1);
 
             // 5. Добавляем таблицу с данными
             Table table = new Table(UnitValue.createPercentArray(new float[]{30, 70}));
             table.setWidth(UnitValue.createPercentValue(100));
 
             // Заголовки таблицы
-            table.addHeaderCell(new Cell().add(new Paragraph("Поле").setBold()));
-            table.addHeaderCell(new Cell().add(new Paragraph("Значение").setBold()));
+            table.addHeaderCell(new Cell().add(new Paragraph("Employee").setBold()));
+            table.addHeaderCell(new Cell().add(new Paragraph("Employee's full name").setBold()));
 
-            // Данные таблицы (пример)
-            table.addCell(new Cell().add(new Paragraph("Статус")));
-            table.addCell(new Cell().add(new Paragraph("Обработана")));
+            // Данные таблицы
+            if (hunter != null && hunter.getId() != null && extractor != null && extractor.getId() != null) {
+                table.addCell(new Cell().add(new Paragraph("Extractor")));
+                table.addCell(new Cell().add(new Paragraph(extractor.getSurname() + " " + extractor.getName() + " " + extractor.getPatronymic())));
 
-            table.addCell(new Cell().add(new Paragraph("Тип")));
-            table.addCell(new Cell().add(new Paragraph("Магическая")));
-
-            table.addCell(new Cell().add(new Paragraph("Сумма")));
-            table.addCell(new Cell().add(new Paragraph("15 000 руб.")));
+                table.addCell(new Cell().add(new Paragraph("Hunter")));
+                table.addCell(new Cell().add(new Paragraph(hunter.getSurname() + " " + hunter.getName() + " " + hunter.getPatronymic())));
+            } else if (extractor != null && extractor.getId() != null) {
+                table.addCell(new Cell().add(new Paragraph("Extractor")));
+                table.addCell(new Cell().add(new Paragraph(extractor.getSurname() + " " + extractor.getName() + " " + extractor.getPatronymic())));
+            } else {
+                return null;
+            }
 
             document.add(table);
 
             document.add(new Paragraph("\n")); // пустая строка
 
             // 6. Добавляем подпись
-            Paragraph signature = new Paragraph("Генератор отчетов\nСистема управления заявками")
+            document.add(new Paragraph("Date of report generation: " + java.time.LocalDate.now())
+                    .setFontSize(10)
+                    .setItalic()
+                    .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.RIGHT));
+            Paragraph signature = new Paragraph("Report generator by MagLogistica\nReport system")
                     .setFontSize(10)
                     .setItalic()
                     .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.RIGHT);
             document.add(signature);
+
+            document.add(new Paragraph("\n"));
+
+            Paragraph signaturePerson = new Paragraph("___________________")
+                    .setFontSize(10)
+                    .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.RIGHT);
+            document.add(signaturePerson);
 
             // 7. Закрываем документ
             document.close();
@@ -244,5 +404,126 @@ public class ExtractorServiceImpl implements ExtractorService {
         return new ByteArrayInputStream(out.toByteArray());
     }
 
+    @Override
+    public ByteArrayInputStream generateReportTwo(String userId, String applicationId) {
+        Extractor extractor = extractorRepository.findById(userId).orElse(null);
+        HunterApplication hunterApplication = hunterApplicationRepository.findById(applicationId).orElse(null);
+        if (extractor == null || hunterApplication == null) {
+            return null;
+        }
+        Magic magic = magicRepository.findById(hunterApplication.getMagic().getId()).orElse(null);
+        if (magic == null) {
+            return null;
+        }
+        Hunter hunter = hunterRepository.findById(hunterApplication.getHunter().getId()).orElse(null);
+
+        // Создаем поток для записи PDF в память
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        try {
+            // 1. Инициализация PDF документа
+            PdfWriter writer = new PdfWriter(out);
+            PdfDocument pdfDoc = new PdfDocument(writer);
+            Document document = new Document(pdfDoc);
+
+            document.setMargins(110, 70, 0, 70);
+            // 2. Загружаем шрифт с поддержкой кириллицы
+            PdfFont font = PdfFontFactory.createFont(StandardFonts.TIMES_ROMAN);
+
+            document.setFont(font);
+
+            InputStream imageStream = getClass().getResourceAsStream("fon_for_report.png");
+            if (imageStream == null) {
+                // Если файл не найден в ресурсах, попробуем другой путь
+                imageStream = getClass().getClassLoader().getResourceAsStream("fon_for_report.png");
+            }
+
+            if (imageStream != null) {
+                byte[] imageBytes = imageStream.readAllBytes();
+                ImageData imageData = ImageDataFactory.create(imageBytes);
+
+                // 4. Создаем обработчик событий для добавления фона на каждую страницу
+                MagicianService.BackgroundEventHandler handler = new MagicianService.BackgroundEventHandler(imageData);
+                pdfDoc.addEventHandler(PdfDocumentEvent.START_PAGE, handler);
+            } else {
+                System.err.println("Фоновое изображение не найдено. Будет создан отчет без фона.");
+            }
+
+            // 3. Добавляем заголовок
+            Paragraph title = new Paragraph("Report by hunter application with id:\n" + applicationId)
+                    .setFontSize(16)
+                    .setBold()
+                    .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER);
+            document.add(title);
+
+            document.add(new Paragraph("\n")); // пустая строка
+
+            // 4. Добавляем информацию
+            document.add(new Paragraph("Applicant's full name : " + extractor.getSurname() + " " + extractor.getName() + " " + extractor.getPatronymic()).setFontSize(14));
+            document.add(new Paragraph("Application type: Hunter application").setFontSize(14));
+            document.add(new Paragraph("Magic:" + magic.getMagicColour().getName() + ", " + magic.getMagicPower().getName() + ", " + magic.getMagicType().getName() + ", " + magic.getMagicState().getName()).setFontSize(14));
+            document.add(new Paragraph("Application status: " + hunterApplication.getStatus()).setFontSize(14));
+
+            document.add(new Paragraph("\n")); // пустая строка
+            Paragraph subTitle1 = new Paragraph("Application lifecycle\n")
+                    .setFontSize(14)
+                    .setBold()
+                    .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER);
+            document.add(subTitle1);
+
+            // 5. Добавляем таблицу с данными
+            Table table = new Table(UnitValue.createPercentArray(new float[]{30, 70}));
+            table.setWidth(UnitValue.createPercentValue(100));
+
+            // Заголовки таблицы
+            table.addHeaderCell(new Cell().add(new Paragraph("Employee").setBold()));
+            table.addHeaderCell(new Cell().add(new Paragraph("Employee's full name").setBold()));
+
+            // Данные таблицы
+            if (hunter != null && hunter.getId() != null && extractor != null && extractor.getId() != null) {
+                table.addCell(new Cell().add(new Paragraph("Extractor")));
+                table.addCell(new Cell().add(new Paragraph(extractor.getSurname() + " " + extractor.getName() + " " + extractor.getPatronymic())));
+
+                table.addCell(new Cell().add(new Paragraph("Hunter")));
+                table.addCell(new Cell().add(new Paragraph(hunter.getSurname() + " " + hunter.getName() + " " + hunter.getPatronymic())));
+            } else if (extractor != null && extractor.getId() != null) {
+                table.addCell(new Cell().add(new Paragraph("Extractor")));
+                table.addCell(new Cell().add(new Paragraph(extractor.getSurname() + " " + extractor.getName() + " " + extractor.getPatronymic())));
+            } else {
+                return null;
+            }
+
+            document.add(table);
+
+            document.add(new Paragraph("\n")); // пустая строка
+
+            // 6. Добавляем подпись
+            document.add(new Paragraph("Date of report generation: " + java.time.LocalDate.now())
+                    .setFontSize(10)
+                    .setItalic()
+                    .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.RIGHT));
+            Paragraph signature = new Paragraph("Report generator by MagLogistica\nReport system")
+                    .setFontSize(10)
+                    .setItalic()
+                    .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.RIGHT);
+            document.add(signature);
+
+            document.add(new Paragraph("\n"));
+
+            Paragraph signaturePerson = new Paragraph("___________________")
+                    .setFontSize(10)
+                    .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.RIGHT);
+            document.add(signaturePerson);
+
+            // 7. Закрываем документ
+            document.close();
+
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка при генерации PDF: " + e.getMessage(), e);
+        }
+
+        // 8. Возвращаем InputStream
+        return new ByteArrayInputStream(out.toByteArray());
+    }
 
 }
