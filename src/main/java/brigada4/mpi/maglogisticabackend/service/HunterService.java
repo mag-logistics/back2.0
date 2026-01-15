@@ -8,6 +8,7 @@ import brigada4.mpi.maglogisticabackend.repositories.HunterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 public interface HunterService {
@@ -23,4 +24,8 @@ public interface HunterService {
     List<HunterResponseDTO> getMyResponses(String email);
 
     HunterResponseDTO completeApplication(String email, String applicationId);
+
+    ByteArrayInputStream generateReportOne(String userId, String applicationId);
+
+    ByteArrayInputStream generateReportTwo(String userId, String applicationId);
 }

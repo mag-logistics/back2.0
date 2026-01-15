@@ -4,10 +4,7 @@ import brigada4.mpi.maglogisticabackend.dto.AnimalDTO;
 import brigada4.mpi.maglogisticabackend.dto.MagicDTO;
 import brigada4.mpi.maglogisticabackend.mapper.AnimalMapper;
 import brigada4.mpi.maglogisticabackend.mapper.MagicMapper;
-import brigada4.mpi.maglogisticabackend.service.ExtractorService;
-import brigada4.mpi.maglogisticabackend.service.GeneralService;
-import brigada4.mpi.maglogisticabackend.service.MagicianService;
-import brigada4.mpi.maglogisticabackend.service.StorekeeperService;
+import brigada4.mpi.maglogisticabackend.service.*;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -27,14 +24,16 @@ public class GeneralController {
     private final MagicianService magicianService;
     private final StorekeeperService storekeeperService;
     private final ExtractorService extractorService;
+    private final HunterService hunterService;
 
-    public GeneralController(GeneralService generalService, AnimalMapper animalMapper, MagicMapper magicMapper, MagicianService magicianService, StorekeeperService storekeeperService, ExtractorService extractorService) {
+    public GeneralController(GeneralService generalService, AnimalMapper animalMapper, MagicMapper magicMapper, MagicianService magicianService, StorekeeperService storekeeperService, ExtractorService extractorService, HunterService hunterService) {
         this.generalSerivce = generalService;
         this.animalMapper = animalMapper;
         this.magicMapper = magicMapper;
         this.magicianService = magicianService;
         this.storekeeperService = storekeeperService;
         this.extractorService = extractorService;
+        this.hunterService = hunterService;
     }
 
     /**
@@ -83,6 +82,9 @@ public class GeneralController {
             case "Hunter":
                 bis = extractorService.generateReportOne(userId, applicationId);
                 break;
+            case "Hunter1":
+                bis = hunterService.generateReportOne(userId, applicationId);
+                break;
             default:
                 return ResponseEntity.badRequest().body("Не найдено соответствующей заявки");
         }
@@ -110,10 +112,13 @@ public class GeneralController {
                 bis = magicianService.generateReportTwo(userId, applicationId);
                 break;
             case "Extraction":
-                bis = storekeeperService.generateReportOne(userId, applicationId);
+                bis = storekeeperService.generateReportTwo(userId, applicationId);
                 break;
             case "Hunter":
-                bis = extractorService.generateReportOne(userId, applicationId);
+                bis = extractorService.generateReportTwo(userId, applicationId);
+                break;
+            case "Hunter1":
+                bis = hunterService.generateReportTwo(userId, applicationId);
                 break;
             default:
                 return ResponseEntity.badRequest().body("Не найдено соответствующей заявки");

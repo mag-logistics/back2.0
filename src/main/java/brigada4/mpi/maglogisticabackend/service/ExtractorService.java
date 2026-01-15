@@ -28,5 +28,7 @@ public interface ExtractorService {
     Boolean canCollectMagic(String applicationId);
 
     ByteArrayInputStream generateReportOne(String userId, String applicationId);
+
+    ByteArrayInputStream generateReportTwo(String userId, String applicationId);
 }
 
