@@ -107,7 +107,7 @@ public class GeneralController {
         headers.add("Content-Disposition", "inline; filename=citiesreport.pdf");
         switch (applicationType) {
             case "Magic":
-                bis = magicianService.generateReportOne(userId, applicationId);
+                bis = magicianService.generateReportTwo(userId, applicationId);
                 break;
             case "Extraction":
                 bis = storekeeperService.generateReportOne(userId, applicationId);

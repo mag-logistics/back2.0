@@ -1,20 +1,20 @@
 insert into sex (id, name) values ('c99ccd51-5731-42a3-9cfc-31cc4011e035','Мужской');
 insert into sex (id, name) values ('848f4054-a9c1-4525-9e10-2ab07e3e9b4c','Женский');
 
-insert into magic_colour (id, name) values ('9d53746d-c930-464a-a750-fb77ef4c13ec', 'Белая');
-insert into magic_colour (id, name) values ('6f7862d8-cff0-4033-ae46-9a0923af6728', 'Черная');
-insert into magic_colour (id, name) values ('1075c7ce-4982-4987-90d4-177a6e98602b', 'Фиолетовая');
+insert into magic_colour (id, name) values ('9d53746d-c930-464a-a750-fb77ef4c13ec', 'White');
+insert into magic_colour (id, name) values ('6f7862d8-cff0-4033-ae46-9a0923af6728', 'Black');
+insert into magic_colour (id, name) values ('1075c7ce-4982-4987-90d4-177a6e98602b', 'Purple');
 
-insert into magic_power (id, name) values ('02fca322-e58a-44a8-a1d4-3caed2007b89', 'Слабая');
-insert into magic_power (id, name) values ('495ad606-4aa9-4af8-be22-f6b3b6f9e358', 'Средняя');
-insert into magic_power (id, name) values ('b1a7e6ae-d5f5-40a4-8421-730403ba101d', 'Мощная');
+insert into magic_power (id, name) values ('02fca322-e58a-44a8-a1d4-3caed2007b89', 'Weak');
+insert into magic_power (id, name) values ('495ad606-4aa9-4af8-be22-f6b3b6f9e358', 'Strong');
+insert into magic_power (id, name) values ('b1a7e6ae-d5f5-40a4-8421-730403ba101d', 'Powerful');
 
-insert into magic_type (id, name) values ('f1046ff8-9014-4041-bdb3-650bb89fcce5', 'Добрая');
-insert into magic_type (id, name) values ('131785d0-80b8-4203-be98-16a8526540f5', 'Злая');
-insert into magic_type (id, name) values ('c99f5672-bf7d-4d0b-952e-c9d59ba8e6f8', 'Нейтральная');
+insert into magic_type (id, name) values ('f1046ff8-9014-4041-bdb3-650bb89fcce5', 'Kind');
+insert into magic_type (id, name) values ('131785d0-80b8-4203-be98-16a8526540f5', 'Evil');
+insert into magic_type (id, name) values ('c99f5672-bf7d-4d0b-952e-c9d59ba8e6f8', 'Neutral');
 
-insert into magic_state (id, name) values ('4fce0448-6786-4fc1-b673-a7d78ebf7242', 'Жидкая');
-insert into magic_state (id, name) values ('95732eae-c77f-4d12-9e34-fa54a00f068b', 'Кристаллическая');
+insert into magic_state (id, name) values ('4fce0448-6786-4fc1-b673-a7d78ebf7242', 'Liquid');
+insert into magic_state (id, name) values ('95732eae-c77f-4d12-9e34-fa54a00f068b', 'Crystalline');
 
 -- Insert Magic
 insert into magic (id, magic_colour_id, magic_power_id, magic_type_id, magic_state_id)

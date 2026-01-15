@@ -113,7 +113,7 @@ CREATE TABLE hunter_response
 (
     id varchar(36) NOT NULL PRIMARY KEY UNIQUE,
     hunter_id  varchar(36) NOT NULL,
-    hunter_application_id varchar(15) NOT NULL UNIQUE,
+    hunter_application_id varchar(36) NOT NULL UNIQUE,
     response_date date,
     volume int,
     FOREIGN KEY (hunter_application_id) REFERENCES hunter_application(id)
