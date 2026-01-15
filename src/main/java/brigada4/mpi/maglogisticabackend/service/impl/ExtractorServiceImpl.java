@@ -342,7 +342,7 @@ public class ExtractorServiceImpl implements ExtractorService {
             document.add(new Paragraph("Applicant's full name : " + extractor.getSurname() + " " + extractor.getName() + " " + extractor.getPatronymic()).setFontSize(14));
             document.add(new Paragraph("Application type: Extraction application").setFontSize(14));
             document.add(new Paragraph("Magic:" + magic.getMagicColour().getName() + ", " + magic.getMagicPower().getName() + ", " + magic.getMagicType().getName() + ", " + magic.getMagicState().getName()).setFontSize(14));
-            document.add(new Paragraph("Application status: " + hunterApplication.getStatus()).setFontSize(14));
+            document.add(new Paragraph("Application status: " + extractionApplication.getStatus()).setFontSize(14));
 
             document.add(new Paragraph("\n")); // пустая строка
             Paragraph subTitle1 = new Paragraph("Application lifecycle\n")
@@ -477,7 +477,7 @@ public class ExtractorServiceImpl implements ExtractorService {
             document.add(new Paragraph("Applicant's full name : " + extractor.getSurname() + " " + extractor.getName() + " " + extractor.getPatronymic()).setFontSize(14));
             document.add(new Paragraph("Application type: Extraction application").setFontSize(14));
             document.add(new Paragraph("Magic:" + magic.getMagicColour().getName() + ", " + magic.getMagicPower().getName() + ", " + magic.getMagicType().getName() + ", " + magic.getMagicState().getName()).setFontSize(14));
-            document.add(new Paragraph("Application status: " + hunterApplication.getStatus()).setFontSize(14));
+            document.add(new Paragraph("Application status: " + extractionApplication.getStatus()).setFontSize(14));
 
             document.add(new Paragraph("\n")); // пустая строка
             Paragraph subTitle1 = new Paragraph("Application lifecycle\n")
