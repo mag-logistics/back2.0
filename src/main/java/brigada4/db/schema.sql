@@ -86,7 +86,7 @@ CREATE TABLE extraction_response
 (
     id            varchar(36) NOT NULL PRIMARY KEY UNIQUE,
     extractor_id  varchar(36) NOT NULL,
-    extraction_application_id varchar(15) NOT NULL UNIQUE ,
+    extraction_application_id varchar(36) NOT NULL UNIQUE,
     response_date date,
 
     FOREIGN KEY (extraction_application_id) REFERENCES extraction_applications(id)
