@@ -1,5 +1,7 @@
 package brigada4.mpi.maglogisticabackend.security;
 
+import brigada4.mpi.maglogisticabackend.exception.InvalidJwtTokenException;
+import brigada4.mpi.maglogisticabackend.exception.JwtTokenExpiredException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -58,18 +60,19 @@ public class JwtUtils {
     public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);
-
             return true;
+        } catch (ExpiredJwtException e) {
+            logger.error("JWT token is expired: {}", e.getMessage());
+            throw new JwtTokenExpiredException("JWT-токен устарел");
         } catch (MalformedJwtException e) {
             logger.error("Invalid JWT token: {}", e.getMessage());
-        } catch (ExpiredJwtException e) {
-            logger.error("Expired JWT token: {}", e.getMessage());
+            throw new InvalidJwtTokenException("Недействительный JWT-токен");
         } catch (UnsupportedJwtException e) {
-            logger.error("Unsupported JWT token: {}", e.getMessage());
+            logger.error("JWT token is unsupported: {}", e.getMessage());
+            throw new InvalidJwtTokenException("JWT-токен не поддерживается");
         } catch (IllegalArgumentException e) {
             logger.error("JWT claims string is empty: {}", e.getMessage());
+            throw new InvalidJwtTokenException("JWT claims string is empty");
         }
-
-        return false;
     }
 }
