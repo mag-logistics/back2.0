@@ -1,6 +1,7 @@
 package brigada4.mpi.maglogisticabackend.service.impl;
 
 import brigada4.mpi.maglogisticabackend.dto.HunterApplicationDTO;
+import brigada4.mpi.maglogisticabackend.dto.HunterHuntingResultRequestDTO;
 import brigada4.mpi.maglogisticabackend.dto.HunterResponseDTO;
 import brigada4.mpi.maglogisticabackend.exception.ConflictException;
 import brigada4.mpi.maglogisticabackend.exception.NotFoundException;
@@ -34,6 +35,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class HunterServiceImpl implements HunterService {
@@ -136,24 +139,38 @@ public class HunterServiceImpl implements HunterService {
     }
 
     @Override
-    public HunterResponseDTO completeApplication(String email, String applicationId) {
+    public HunterResponseDTO completeApplication(String email, String applicationId,  HunterHuntingResultRequestDTO result) {
 
         HunterApplication app = hunterApplicationRepository.findById(applicationId)
                 .orElseThrow(() -> new NotFoundException("Заявка " + applicationId + " не найдена"));
 
-        Animal animal = app.getAnimal();
-        int requiredQuantity = app.getAnimalCount();
+        Map<String, Integer> animals = result.getAnimals();
 
-        AnimalStorage animalStorage = animalStorageRepository.findByAnimalId(animal.getId());
-        animalStorage.setQuantity(animalStorage.getQuantity() + requiredQuantity);
+        for  (Map.Entry<String, Integer> animal : animals.entrySet()) {
 
-        animalStorageRepository.save(animalStorage);
+            String animalId = animal.getKey();
+            int quantity = animal.getValue();
+
+            if (quantity <= 0) {
+                throw new IllegalArgumentException("Количество должно быть положительным для animalId=" + animalId);
+            }
+
+            AnimalStorage storage = animalStorageRepository.findByAnimalId(animalId);
+
+            if (storage == null) {
+                throw new NotFoundException("Хранилищи для животного " + animalId + " не найдено");
+            }
+
+            storage.setQuantity(storage.getQuantity() + quantity);
+
+            animalStorageRepository.save(storage);
+        }
 
         HunterResponse hunterResponse = new HunterResponse(
                 app.getId(),
                 app.getHunter(),
                 new Date(),
-                requiredQuantity
+                app.getAnimalCount()
         );
 
         hunterResponseRepository.save(hunterResponse);

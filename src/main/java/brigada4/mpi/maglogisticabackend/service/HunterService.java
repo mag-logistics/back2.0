@@ -1,6 +1,7 @@
 package brigada4.mpi.maglogisticabackend.service;
 
 import brigada4.mpi.maglogisticabackend.dto.HunterApplicationDTO;
+import brigada4.mpi.maglogisticabackend.dto.HunterHuntingResultRequestDTO;
 import brigada4.mpi.maglogisticabackend.dto.HunterResponseDTO;
 import brigada4.mpi.maglogisticabackend.dto.StatusDTO;
 import brigada4.mpi.maglogisticabackend.models.HunterApplication;
@@ -23,7 +24,7 @@ public interface HunterService {
 
     List<HunterResponseDTO> getMyResponses(String email);
 
-    HunterResponseDTO completeApplication(String email, String applicationId);
+    HunterResponseDTO completeApplication(String email, String applicationId, HunterHuntingResultRequestDTO result);
 
     ByteArrayInputStream generateReportOne(String userId, String applicationId);
 

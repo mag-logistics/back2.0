@@ -1,6 +1,7 @@
 package brigada4.mpi.maglogisticabackend.controllers;
 
 import brigada4.mpi.maglogisticabackend.dto.HunterApplicationDTO;
+import brigada4.mpi.maglogisticabackend.dto.HunterHuntingResultRequestDTO;
 import brigada4.mpi.maglogisticabackend.dto.HunterResponseDTO;
 import brigada4.mpi.maglogisticabackend.dto.StatusDTO;
 import brigada4.mpi.maglogisticabackend.models.HunterApplication;
@@ -57,8 +58,8 @@ public class HunterController {
 
     @PostMapping("/application/{id}/complete")
     @ResponseStatus(HttpStatus.OK)
-    public HunterResponseDTO completeApplication(Authentication authentication, @PathVariable String id) {
-        return hunterService.completeApplication(authentication.getName(), id);
+    public HunterResponseDTO completeApplication(Authentication authentication, @PathVariable String id, @RequestBody HunterHuntingResultRequestDTO result) {
+        return hunterService.completeApplication(authentication.getName(), id, result);
     }
 
 }
