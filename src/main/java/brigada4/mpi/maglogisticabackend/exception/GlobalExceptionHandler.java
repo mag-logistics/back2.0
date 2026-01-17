@@ -3,6 +3,8 @@ package brigada4.mpi.maglogisticabackend.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -20,6 +22,57 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(
                 "NOT_FOUND",
                 ex.getMessage(),
+                Instant.now()
+        );
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleInvalidCredentials(InvalidCredentialsException ex) {
+        return new ErrorResponse(
+                "INVALID_CREDENTIALS",
+                ex.getMessage(),
+                Instant.now()
+        );
+    }
+
+    @ExceptionHandler(JwtTokenExpiredException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleJwtTokenExpired(JwtTokenExpiredException ex) {
+        return new ErrorResponse(
+                "TOKEN_EXPIRED",
+                ex.getMessage(),
+                Instant.now()
+        );
+    }
+
+    @ExceptionHandler(InvalidJwtTokenException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleInvalidJwtToken(InvalidJwtTokenException ex) {
+        return new ErrorResponse(
+                "INVALID_TOKEN",
+                ex.getMessage(),
+                Instant.now()
+        );
+    }
+
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleAuthenticationException(AuthenticationException ex) {
+        return new ErrorResponse(
+                "AUTHENTICATION_FAILED",
+                ex.getMessage(),
+                Instant.now()
+        );
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleAccessDeniedException(AccessDeniedException ex) {
+        return new ErrorResponse(
+                "ACCESS_DENIED",
+                "You don't have permission to access this resource",
                 Instant.now()
         );
     }
