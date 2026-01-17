@@ -40,7 +40,6 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
             String jwt = parseJwt(request);
 
             if (jwt != null) {
-                // Валидация токена - выбрасывает исключения при ошибках
                 if (jwtUtils.validateJwtToken(jwt)) {
                     String username = jwtUtils.getUsernameFromToken(jwt);
 
