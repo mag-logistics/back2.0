@@ -1,0 +1,42 @@
+app:
+  frontend:
+    url: http://locahost:5173
+  backend:
+    url: http://localhost:8080
+
+test:
+  users:
+    mage:
+      username: test_mage
+      password: mage_pass
+    storekeeper:
+      username: test_storekeeper
+      password: storekeeper_pass
+    hunter:
+      username: test_hunter
+      password: hunter_pass
+    extractor:
+      username: test_extractor
+      password: extractor_pass
+  default-wait-timeout: 10000
+  screenshot-on-failure: true
+  browser: chrome
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/magic_db_test
+    username: postgres
+    password: postgres
+  liquibase:
+    change-log: classpath:db.migrations/changelog.xml
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: true
+
+selenium:
+  timeout:
+    implicit: 5
+    explicit: 15
+  headless: false
